@@ -17,7 +17,7 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
   if (y_ps2 > 0) {left_motor *= -1; right_motor *= -1;}
 
   float cos_a = x_ps2 / length;
-
+    
   if (cos_a > 0){
     float right_move = (cos_a - 0.5)*(-2);
     right_motor *= right_move;
