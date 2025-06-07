@@ -28,7 +28,7 @@ void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2){
     setPWMMotors(end, pin1, pin2);
   }
   else if (start > end){
-    for(int temp = start; temp <= end; temp -= step){
+    for(int temp = start; temp >= end; temp -= step){
         setPWMMotors(temp, pin1, pin2);
     }
     setPWMMotors(end, pin1, pin2);
@@ -76,13 +76,17 @@ void safe_rotate(float power_current, float power_new, int pin1, int pin2){ // p
     else if(power_current < 0){
       smooth_increase_decrease(value, value_new, STEP, pin2, pin1);
     }
+    else{
+      if(power_new > 0) smooth_increase_decrease(value, value_new, STEP, pin1, pin2);
+      else if (power_new < 0) smooth_increase_decrease(value, value_new, STEP, pin2, pin1);
+    }
   }
 }
 
 void setup(){
   Serial.begin(115200);
   delay(2000);
-  safe_rotate(-1,1,8,9);
+  //safe_rotate(0.25,0.1,8,9);
 }
 
 void loop(){
