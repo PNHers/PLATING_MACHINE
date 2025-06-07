@@ -17,10 +17,7 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
   if (length > 1){
     left_motor = 1;
     right_motor = 1;
-<<<<<<< HEAD
-=======
     length = 1;
->>>>>>> 8fe837fdb6ce297317b32ae469727c9880db9df1
   }
 
   float cos_a = x_ps2 / length;
@@ -88,17 +85,14 @@ void loop() {
   float handled_psx = (ps2x.Analog(PSS_LX)  - 127.5) / 127.5; 
   float handled_psy = (ps2x.Analog(PSS_LY)  - 127.5) / 127.5; 
 
-<<<<<<< HEAD
   Serial.print("Handled Values:");
   Serial.print(handled_psx); //Left stick, Y axis. Other options: LX, RY, RX  
   Serial.print(",");
   Serial.println(handled_psy);  
-=======
   // Serial.print("Handled Values:");
   // Serial.print(handled_psx); //Left stick, Y axis. Other options: LX, RY, RX  
   // Serial.print(",");
   // Serial.println(handled_psy);  
->>>>>>> 8fe837fdb6ce297317b32ae469727c9880db9df1
   
   float rightR = 0, leftR = 0;
   rotate(handled_psx, -handled_psy, &leftR, &rightR);
