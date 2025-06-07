@@ -14,17 +14,30 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
   float length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
   float left_motor = length, right_motor = length;
 
-  if (y_ps2 > 0) {left_motor *= -1; right_motor *= -1;}
-
   float cos_a = x_ps2 / length;
-  // adding somthign
-  if (cos_a > 0){
-    float right_move = (cos_a - 0.5)*(-2);
-    right_motor *= right_move;
+
+  if (y_ps2 < 0) {
+    left_motor *= -1; right_motor *= -1;
+
+    if (cos_a < 0){
+      float right_move = (cos_a - 0.5)*(-2);
+      right_motor *= right_move;
+    }
+    else if (cos_a > 0) {
+      float left_move = (-cos_a - 0.5)*(-2);
+      left_motor *= left_move;
+    }
   }
-  else if (cos_a < 0) {
-    float left_move = (-cos_a - 0.5)*(-2);
-    left_motor *= left_move;
+  else{
+    // adding somthign
+    if (cos_a > 0){
+      float right_move = (cos_a - 0.5)*(-2);
+      right_motor *= right_move;
+    }
+    else if (cos_a < 0) {
+      float left_move = (-cos_a - 0.5)*(-2);
+      left_motor *= left_move;
+    }
   }
   Serial.print(left_motor);
   Serial.print(" : ");
@@ -73,7 +86,7 @@ void loop() {
   
   float rightR = 0, leftR = 0;
   Serial.print("Motor run at :");
-  rotate(handled_psx, handled_psy, &leftR, &rightR);
+  rotate(handled_psx, -handled_psy, &leftR, &rightR);
 
   delay(1000);
 
