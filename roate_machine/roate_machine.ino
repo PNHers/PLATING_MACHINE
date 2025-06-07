@@ -26,11 +26,11 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
     left_motor *= -1; right_motor *= -1;
 
     if (cos_a < 0){
-      float right_move = (cos_a - 0.5)*(-2);
+      float right_move = (-cos_a - 0.5)*(-2);
       right_motor *= right_move;
     }
     else if (cos_a > 0) {
-      float left_move = (-cos_a - 0.5)*(-2);
+      float left_move = (cos_a - 0.5)*(-2);
       left_motor *= left_move;
     }
   }
@@ -99,6 +99,6 @@ void loop() {
   Serial.print(" : ");
   Serial.println(Rrotate);
 
-  delay(1000);
+  delay(10);
 
 }
