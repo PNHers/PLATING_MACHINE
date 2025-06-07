@@ -14,6 +14,12 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
   float length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
   float left_motor = length, right_motor = length;
 
+  if (length > 1){
+    x_ps2 /= length;
+    y_ps2 /= length;
+    length = 1;
+  }
+
   float cos_a = x_ps2 / length;
 
   if (y_ps2 < 0) {
