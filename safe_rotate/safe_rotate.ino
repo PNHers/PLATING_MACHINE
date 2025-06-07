@@ -12,6 +12,12 @@ void swap(int& a, int& b){
 void setPWMMotors(int value, int pin1, int pin2){
    //pwm.setPin(pin1, value);
    //pwm.setPin(pin2, 0);
+  Serial.print(value);
+  Serial.print(" pin: ");
+  Serial.print(pin1);
+  Serial.print(" ");
+  Serial.println(pin2);
+  delay(200);
 }
 
 void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2){
@@ -38,7 +44,7 @@ void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2){
 void safe_rotate(float power_current, float power_new, int pin1, int pin2){ // power đi từ 1 đến -1. 0 là điểm trung gian
 
   bool isInvert = false;
-  int value = abs(int(-power_current * max_power));
+  int value = abs(int(power_current * max_power));
   int value_new = abs(int(power_new * max_power));
 
   if(power_current * power_new < 0) isInvert = true;
@@ -57,9 +63,11 @@ void safe_rotate(float power_current, float power_new, int pin1, int pin2){ // p
     if(power_current > 0){
       smooth_increase_decrease(value, 0, STEP, pin1, pin2);
       smooth_increase_decrease(0, value_new, STEP, pin2, pin1);
+    }
     else if (power_current < 0){
       smooth_increase_decrease(value, 0, STEP, pin2, pin1);
       smooth_increase_decrease(0, value_new, STEP, pin1, pin2);
+    }
   }
   else{
     if(power_current > 0){
@@ -69,4 +77,14 @@ void safe_rotate(float power_current, float power_new, int pin1, int pin2){ // p
       smooth_increase_decrease(value, value_new, STEP, pin2, pin1);
     }
   }
+}
+
+void setup(){
+  Serial.begin(115200);
+  delay(2000);
+  safe_rotate(-1,1,8,9);
+}
+
+void loop(){
+
 }

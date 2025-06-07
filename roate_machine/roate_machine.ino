@@ -15,9 +15,8 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
   float left_motor = length, right_motor = length;
 
   if (length > 1){
-    x_ps2 /= length;
-    y_ps2 /= length;
-    length = 1;
+    left_motor = 1;
+    right_motor = 1;
   }
 
   float cos_a = x_ps2 / length;
@@ -88,7 +87,7 @@ void loop() {
   Serial.print("Handled Values:");
   Serial.print(handled_psx); //Left stick, Y axis. Other options: LX, RY, RX  
   Serial.print(",");
-  Serial.println(handled_psy);
+  Serial.println(handled_psy);  
   
   float rightR = 0, leftR = 0;
   Serial.print("Motor run at :");
