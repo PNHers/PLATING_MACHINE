@@ -8,7 +8,7 @@ void swap(int& a, int& b){
   a = b;
   b = temp;
 }
-
+// anh dung dep trai
 void setPWMMotors(int value, int pin1, int pin2){
    //pwm.setPin(pin1, value);
    //pwm.setPin(pin2, 0);
