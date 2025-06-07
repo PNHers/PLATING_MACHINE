@@ -15,8 +15,8 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
   float left_motor = length, right_motor = length;
 
   if (length > 1){
-    x_ps2 /= length;
-    y_ps2 /= length;
+    left_motor = 1;
+    right_motor = 1;
     length = 1;
   }
 
@@ -45,9 +45,9 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
       left_motor *= left_move;
     }
   }
-  Serial.print(left_motor);
-  Serial.print(" : ");
-  Serial.println(right_motor);
+  // Serial.print(left_motor);
+  // Serial.print(" : ");
+  // Serial.println(right_motor);
 
   *left_rotate = left_motor;
   *right_rotate = right_motor;
@@ -77,22 +77,27 @@ void loop() {
   // put your main code here, to run repeatedly:
   ps2x.read_gamepad(); // gọi hàm để đọc tay điều khiển 
 
-  Serial.print("Stick Values:");
-  Serial.print(ps2x.Analog(PSS_LX), DEC); //Left stick, Y axis. Other options: LX, RY, RX  
-  Serial.print(",");
-  Serial.println(ps2x.Analog(PSS_LY), DEC);
+  // Serial.print("Stick Values:");
+  // Serial.print(ps2x.Analog(PSS_LX), DEC); //Left stick, Y axis. Other options: LX, RY, RX  
+  // Serial.print(",");
+  // Serial.println(ps2x.Analog(PSS_LY), DEC);
 
   float handled_psx = (ps2x.Analog(PSS_LX)  - 127.5) / 127.5; 
   float handled_psy = (ps2x.Analog(PSS_LY)  - 127.5) / 127.5; 
 
-  Serial.print("Handled Values:");
-  Serial.print(handled_psx); //Left stick, Y axis. Other options: LX, RY, RX  
-  Serial.print(",");
-  Serial.println(handled_psy);
+  // Serial.print("Handled Values:");
+  // Serial.print(handled_psx); //Left stick, Y axis. Other options: LX, RY, RX  
+  // Serial.print(",");
+  // Serial.println(handled_psy);  
   
   float rightR = 0, leftR = 0;
-  Serial.print("Motor run at :");
   rotate(handled_psx, -handled_psy, &leftR, &rightR);
+  int Rrotate = leftR*100, Lrotate = leftR*100;
+
+  Serial.print("Motor run at :");
+  Serial.print(Lrotate);
+  Serial.print(" : ");
+  Serial.println(Rrotate);
 
   delay(1000);
 
