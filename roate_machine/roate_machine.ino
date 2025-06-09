@@ -91,7 +91,7 @@
     Serial.println(handled_psy);  
     // Serial.print("Handled Values:");
     // Serial.print(handled_psx); //Left stick, Y axis. Other options: LX, RY, RX  
-    // Serial.print(",");
+    // Serial.print(","); 
     // Serial.println(handled_psy);  
     
     float rightR = 0, leftR = 0;
