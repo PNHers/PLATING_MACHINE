@@ -76,7 +76,7 @@ void TakeMotorRotate(float* leftMotor, float* rightMotor) {
   float handled_psx = (ps2x.Analog(PSS_LX)  - 127.5) / 127.5; 
   float handled_psy = (ps2x.Analog(PSS_LY)  - 127.5) / 127.5; 
 
-  rotate(handled_psx, handled_psy, leftMotor, rightMotor);
+  rotate(handled_psx, -handled_psy, leftMotor, rightMotor);
 }
 
 #endif

@@ -31,8 +31,9 @@ void swap(int& a, int& b){
 }
 // anh dung dep trai
 void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver* pwm){
-  pwm.setPin(pin1, value);
-  pwm.setPin(pin2, 0);
+  if (motor_info.power < 0){return ;}
+  pwm->setPin(motor_info.pin1, motor_info.power);
+  pwm->setPin(motor_info.pin2, 0);
 
   Serial.print(motor_info.power);
   Serial.print(" pin: ");
@@ -62,7 +63,7 @@ void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2, 
   và ngược lại
 */
 
-int safe_rotate(float power_current, float power_new, int pin1, int pin2, std::vector<Rotate>* list_rotate){ // power đi từ 1 đến -1. 0 là điểm trung gian
+void safe_rotate(float power_current, float power_new, int pin1, int pin2, std::vector<Rotate>* list_rotate){ // power đi từ 1 đến -1. 0 là điểm trung gian
 
   bool isInvert = false;
   int value = abs(int(power_current * max_power));
@@ -78,7 +79,6 @@ int safe_rotate(float power_current, float power_new, int pin1, int pin2, std::v
     else if(power_current < 0){
       smooth_increase_decrease(value, 0, STEP, pin2, pin1, list_rotate);
     }
-    return 1;
   }
   if(isInvert){
     if(power_current > 0){
@@ -102,7 +102,6 @@ int safe_rotate(float power_current, float power_new, int pin1, int pin2, std::v
       else if (power_new < 0) smooth_increase_decrease(value, value_new, STEP, pin2, pin1, list_rotate);
     }
   }
-  return 0;
 }
 
 bool Check_number(Rotate new_rotate, Rotate present_rotate){
