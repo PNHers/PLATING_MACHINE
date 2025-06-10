@@ -24,7 +24,7 @@ struct RotateInfo{
   int pin2;
 };
 
-void swap(int& a, int& b){
+void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn giữ lại đây =)
   int temp = a;
   a = b;
   b = temp;
