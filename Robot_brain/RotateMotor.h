@@ -34,7 +34,7 @@ void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver* pwm){
   if (motor_info.power < 0){return ;}
   pwm->setPin(motor_info.pin1, motor_info.power);
   pwm->setPin(motor_info.pin2, 0);
-  //delay(10);
+  // delay(100);
   Serial.print(motor_info.power);
   Serial.print(" pin: ");
   Serial.print(motor_info.pin1);
@@ -80,7 +80,7 @@ void safe_rotate(float *power_current, float *power_new, int pin1, int pin2, std
       smooth_increase_decrease(value, 0, STEP, pin2, pin1, list_rotate);
     }
     *power_new = 0;
-  }
+  }// nothing
   else if(isInvert){
     if(*power_current > 0){
       smooth_increase_decrease(value, 0, STEP, pin1, pin2, list_rotate);
