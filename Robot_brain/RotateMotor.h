@@ -106,6 +106,7 @@ void safe_rotate(float *power_current, float *power_new, int pin1, int pin2, std
 }
 
 bool Check_number(Rotate new_rotate, Rotate present_rotate){
+  if (new_rotate.power > 4096 || new_rotate.power < 0) {return false;}
   if (new_rotate.pin1 != present_rotate.pin1 && new_rotate.power * present_rotate.power != 0){return false;}
   return true;
 }

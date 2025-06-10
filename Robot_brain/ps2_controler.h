@@ -28,22 +28,30 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
     left_motor *= -1; right_motor *= -1;
 
     if (cos_a < 0){
-      float right_move = (-cos_a - 0.5)*(-2);
+      float right_move = (-cos_a - (0.5 + (-y_ps2)/2))*(-2 + (-y_ps2));
+      // Serial.print("Right_move : ");
+      // Serial.println(right_move);
       right_motor *= right_move;
     }
     else if (cos_a > 0) {
-      float left_move = (cos_a - 0.5)*(-2);
+      float left_move = (cos_a - (0.5 + (-y_ps2)/2))*(-2 + (-y_ps2));
+      // Serial.print("Left_move : ");
+      // Serial.println(left_move);
       left_motor *= left_move;
     }
   }
   else{
     // adding somthign
     if (cos_a > 0){
-      float right_move = (cos_a - 0.5)*(-2);
+      float right_move = (cos_a - (0.5 + (y_ps2)/2))*(-2 + (y_ps2));
+      // Serial.print("Right_move : ");
+      // Serial.println(right_move);
       right_motor *= right_move;
     }
     else if (cos_a < 0) {
-      float left_move = (-cos_a - 0.5)*(-2);
+      float left_move = (-cos_a - (0.5 + (y_ps2)/2))*(-2 + (y_ps2));
+      // Serial.print("Left_move : ");
+      // Serial.println(left_move);
       left_motor *= left_move;
     }
   }
@@ -72,6 +80,8 @@ void setupPS2() {
 void TakeMotorRotate(float* leftMotor, float* rightMotor) {
   // put your main code here, to run repeatedly:
   ps2x.read_gamepad(); // gọi hàm để đọc tay điều khiển 
+  // Serial.println(ps2x.Analog(PSS_LX));
+  // Serial.println(ps2x.Analog(PSS_LY));
 
   float handled_psx = (ps2x.Analog(PSS_LX)  - 127.5) / 127.5; 
   float handled_psy = (ps2x.Analog(PSS_LY)  - 127.5) / 127.5; 
