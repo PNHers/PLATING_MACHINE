@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #ifndef PS2_CONTROLER_H
 #define PS2_CONTROLER_H
 
@@ -10,19 +11,66 @@
 #define PS2_SEL 15 // SS 
 #define PS2_CLK 14 // SLK
 
+const float sai_so = 0.01; // sai số
+
 PS2X ps2x; // khởi tạo class PS2x
 
-void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
-  float length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
-  float left_motor = length, right_motor = length;
+void check(float* x_ps2, float* y_ps2){ //hàm này loại trừ sai số của tay cầm
+  if(*x_ps2 <= sai_so && *x_ps2 >= -sai_so) *x_ps2 = 0.0f;
+  if(*y_ps2 <= sai_so && *y_ps2 >= -sai_so) *y_ps2 = 0.0f;
+}
 
-  if (length > 1){
-    left_motor = 1;
-    right_motor = 1;
-    length = 1;
-  }
+void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
+  check(&x_ps2, &y_ps2); // kiểm tra sai số
+  float length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
+  float left_motor = 1, right_motor = 1;
+  float actually_x_axis = x_ps2, actually_y_axis = y_ps2;
+
+  // check nếu 2 giá trị được nhập từ console lớn hơn 1 || -1 (có sai số khi test);
+  if(x_ps2 > 1) actually_x_axis = 1;
+  else if (x_ps2 < -1) actually_x_axis = -1;
+  if(y_ps2 > 1) actually_y_axis = 1;
+  else if (y_ps2 <-1) actually_y_axis = -1;
 
   float cos_a = x_ps2 / length;
+
+  if(length <= 1.00){
+      if (x_ps2 >= 0) {
+        actually_x_axis = length * cos_a;
+        actually_y_axis = sqrt(length * length - actually_x_axis * actually_x_axis);
+      }
+      else{
+        actually_y_axis = -(length * cos_a);
+        if(y_ps2 == 0) actually_y_axis = 0;
+        actually_x_axis = -sqrt(length * length - actually_y_axis * actually_y_axis);
+      }
+  }
+  else{
+      if (x_ps2 >= 0 || abs(y_ps2) == 1) {
+        actually_x_axis = 1.00 * cos_a;
+        actually_y_axis = sqrt(1 - actually_x_axis * actually_x_axis);
+      }
+      else{
+        actually_y_axis = -(1.00 * cos_a);
+        actually_x_axis = -sqrt(1 - actually_y_axis * actually_y_axis);
+      }
+  }
+
+  if(y_ps2 < 0) actually_y_axis *= -1; 
+
+  // chỗ này không có thì kết quả cuối ra giá trị nan
+  if(x_ps2 == 0) actually_x_axis = 0;
+  if(y_ps2 == 0) actually_y_axis = 0;
+
+  // Serial.print(actually_x_axis);
+  // Serial.print(" ");
+  // Serial.println(actually_y_axis);
+
+  length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
+  if(length > 1) length = 1;
+  left_motor = length, right_motor = length;
+
+  cos_a = actually_x_axis / length;
 
   if (y_ps2 < 0) {
     left_motor *= -1; right_motor *= -1;
@@ -47,9 +95,10 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
       left_motor *= left_move;
     }
   }
-  // Serial.print(left_motor);
-  // Serial.print(" : ");
-  // Serial.println(right_motor);
+
+  Serial.print(left_motor);
+  Serial.print(" : ");
+  Serial.println(right_motor);
 
   *left_rotate = left_motor;
   *right_rotate = right_motor;
