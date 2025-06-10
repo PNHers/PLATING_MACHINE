@@ -30,7 +30,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   TakeMotorRotate(&left_motor, &right_motor);
   //if (left_motor > 1 || left_motor < -1 || right_motor > 1 || right_motor < -1){Serial.println("ERROR HERE");}
-  rotate_2_motor(RotateInfo(oldLeft, left_motor, 8, 9), RotateInfo(oldRight, right_motor, 10, 11), &pwm);
+  rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   oldLeft = left_motor; oldRight = right_motor;
   //delay(1000);
 }

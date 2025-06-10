@@ -8,7 +8,7 @@
 #include <vector>
 
 #define MENSURE_VAULE 0.05 // sai số khi joystick để ở vị trí ban đầu
-#define max_power 4096
+#define max_power 2025
 #define STEP 100
 
 struct Rotate{
@@ -18,8 +18,8 @@ struct Rotate{
 };
 
 struct RotateInfo{
-  float start;
-  float end;
+  float* start;
+  float* end;
   int pin1;
   int pin2;
 };
@@ -34,7 +34,7 @@ void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver* pwm){
   if (motor_info.power < 0){return ;}
   pwm->setPin(motor_info.pin1, motor_info.power);
   pwm->setPin(motor_info.pin2, 0);
-
+  //delay(10);
   Serial.print(motor_info.power);
   Serial.print(" pin: ");
   Serial.print(motor_info.pin1);
@@ -63,43 +63,44 @@ void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2, 
   và ngược lại
 */
 
-void safe_rotate(float power_current, float power_new, int pin1, int pin2, std::vector<Rotate>* list_rotate){ // power đi từ 1 đến -1. 0 là điểm trung gian
+void safe_rotate(float *power_current, float *power_new, int pin1, int pin2, std::vector<Rotate>* list_rotate){ // power đi từ 1 đến -1. 0 là điểm trung gian
 
   bool isInvert = false;
-  int value = abs(int(power_current * max_power));
-  int value_new = abs(int(power_new * max_power));
+  int value = abs(int(*power_current * max_power));
+  int value_new = abs(int(*power_new * max_power));
 
-  if(power_current * power_new < 0) isInvert = true;
+  if((*power_current) * (*power_new) < 0) isInvert = true;
 
-  if(power_new <= MENSURE_VAULE && power_new >= -MENSURE_VAULE){
-    // sức mạnh của motor bằng 0 khi giá trị power_new nằm trong vùng sai số;
-    if(power_current > 0){
+  if(*power_new <= MENSURE_VAULE && *power_new >= -MENSURE_VAULE){
+    // sức mạnh của motor bằng 0 khi giá trị *power_new nằm trong vùng sai số;
+    if(*power_current > 0){
       smooth_increase_decrease(value, 0, STEP, pin1, pin2, list_rotate);
     }
-    else if(power_current < 0){
+    else if(*power_current < 0){
       smooth_increase_decrease(value, 0, STEP, pin2, pin1, list_rotate);
     }
+    *power_new = 0;
   }
-  if(isInvert){
-    if(power_current > 0){
+  else if(isInvert){
+    if(*power_current > 0){
       smooth_increase_decrease(value, 0, STEP, pin1, pin2, list_rotate);
       smooth_increase_decrease(0, value_new, STEP, pin2, pin1, list_rotate);
     }
-    else if (power_current < 0){
+    else if (*power_current < 0){
       smooth_increase_decrease(value, 0, STEP, pin2, pin1, list_rotate);
       smooth_increase_decrease(0, value_new, STEP, pin1, pin2, list_rotate);
     }
   }
   else{
-    if(power_current > 0){
+    if(*power_current > 0){
       smooth_increase_decrease(value, value_new, STEP, pin1, pin2, list_rotate);
     }
-    else if(power_current < 0){
+    else if(*power_current < 0){
       smooth_increase_decrease(value, value_new, STEP, pin2, pin1, list_rotate);
     }
     else{
-      if(power_new > 0) smooth_increase_decrease(value, value_new, STEP, pin1, pin2, list_rotate);
-      else if (power_new < 0) smooth_increase_decrease(value, value_new, STEP, pin2, pin1, list_rotate);
+      if(*power_new > 0) smooth_increase_decrease(value, value_new, STEP, pin1, pin2, list_rotate);
+      else if (*power_new < 0) smooth_increase_decrease(value, value_new, STEP, pin2, pin1, list_rotate);
     }
   }
 }
