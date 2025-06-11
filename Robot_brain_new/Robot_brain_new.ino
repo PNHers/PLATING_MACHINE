@@ -1,6 +1,6 @@
 #include "RotateMotor.h"
 #include "ps2_controler.h"
-#include "timers.h"
+#include "time_control.h"
 
 #define motorA1 8 // đầu dương
 #define motorA2 9
@@ -61,5 +61,5 @@ void loop() {
   //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   // oldLeft = left_motor; oldRight = right_motor;
   //delay(1000);
-  println(rtc.getSeconds());
+  Serial.println(rtc.getSeconds());
 }
