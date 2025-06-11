@@ -20,10 +20,9 @@ void check(float* x_ps2, float* y_ps2){ //hàm này loại trừ sai số của 
   if(*y_ps2 <= sai_so && *y_ps2 >= -sai_so) *y_ps2 = 0.0f;
 }
 
-void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
+void rotate(float x_ps2, float y_ps2, float *x_axis, float *y_axis){
   check(&x_ps2, &y_ps2); // kiểm tra sai số
   float length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
-  float left_motor = 1, right_motor = 1;
   float actually_x_axis = x_ps2, actually_y_axis = y_ps2;
 
   // check nếu 2 giá trị được nhập từ console lớn hơn 1 || -1 (có sai số khi test);
@@ -43,6 +42,7 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
         actually_y_axis = -(length * cos_a);
         if(y_ps2 == 0) actually_y_axis = 0;
         actually_x_axis = -sqrt(length * length - actually_y_axis * actually_y_axis);
+        
       }
   }
   else{
@@ -51,8 +51,8 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
         actually_y_axis = sqrt(1 - actually_x_axis * actually_x_axis);
       }
       else{
-        actually_y_axis = -(1.00 * cos_a);
-        actually_x_axis = -sqrt(1 - actually_y_axis * actually_y_axis);
+        actually_x_axis = 1.00 * cos_a;
+        actually_y_axis = sqrt(1 - actually_x_axis * actually_x_axis);
       }
   }
 
@@ -66,42 +66,42 @@ void rotate(float x_ps2, float y_ps2, float *left_rotate, float *right_rotate){
   // Serial.print(" ");
   // Serial.println(actually_y_axis);
 
-  length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
-  if(length > 1) length = 1;
-  left_motor = length, right_motor = length;
+  // length = sqrt(x_ps2*x_ps2 + y_ps2*y_ps2);
+  // if(length > 1) length = 1;
+  // left_motor = length, right_motor = length;
 
-  cos_a = actually_x_axis / length;
+  // cos_a = actually_x_axis / length;
 
-  if (y_ps2 < 0) {
-    left_motor *= -1; right_motor *= -1;
+  // if (y_ps2 < 0) {
+  //   left_motor *= -1; right_motor *= -1;
 
-    if (cos_a < 0){
-      float right_move = (-cos_a - 0.5)*(-2);
-      right_motor *= right_move;
-    }
-    else if (cos_a > 0) {
-      float left_move = (cos_a - 0.5)*(-2);
-      left_motor *= left_move;
-    }
-  }
-  else{
-    // adding somthign
-    if (cos_a > 0){
-      float right_move = (cos_a - 0.5)*(-2);
-      right_motor *= right_move;
-    }
-    else if (cos_a < 0) {
-      float left_move = (-cos_a - 0.5)*(-2);
-      left_motor *= left_move;
-    }
-  }
+  //   if (cos_a < 0){
+  //     float right_move = (-cos_a - 0.5)*(-2);
+  //     right_motor *= right_move;
+  //   }
+  //   else if (cos_a > 0) {
+  //     float left_move = (cos_a - 0.5)*(-2);
+  //     left_motor *= left_move;
+  //   }
+  // }
+  // else{
+  //   // adding somthign
+  //   if (cos_a > 0){
+  //     float right_move = (cos_a - 0.5)*(-2);
+  //     right_motor *= right_move;
+  //   }
+  //   else if (cos_a < 0) {
+  //     float left_move = (-cos_a - 0.5)*(-2);
+  //     left_motor *= left_move;
+  //   }
+  // }
 
-  Serial.print(left_motor);
-  Serial.print(" : ");
-  Serial.println(right_motor);
+  // Serial.print(left_motor);
+  // Serial.print(" : ");
+  // Serial.println(right_motor);
 
-  *left_rotate = left_motor;
-  *right_rotate = right_motor;
+  *x_axis = actually_x_axis;
+  *y_axis = actually_y_axis;
 } 
 
 void setupPS2() {
@@ -118,7 +118,7 @@ void setupPS2() {
   
 }
 
-void TakeMotorRotate(float* leftMotor, float* rightMotor) {
+void position_of_console(float* x_axis, float* y_axis) {
   // put your main code here, to run repeatedly:
   ps2x.read_gamepad(); // gọi hàm để đọc tay điều khiển 
 
@@ -126,7 +126,6 @@ void TakeMotorRotate(float* leftMotor, float* rightMotor) {
   // Serial.print(" ");
   // Serial.println(ps2x.Analog(PSS_LY));
   
-
   float handled_psx = (ps2x.Analog(PSS_LX)  - 127.5) / 127.5; 
   float handled_psy = (ps2x.Analog(PSS_LY)  - 127.5) / 127.5; 
 
@@ -134,7 +133,7 @@ void TakeMotorRotate(float* leftMotor, float* rightMotor) {
   // Serial.print(" ");
   // Serial.println(handled_psy);
 
-  rotate(handled_psx, -handled_psy, leftMotor, rightMotor);
+  rotate(handled_psx, -handled_psy, x_axis, y_axis);
 }
 
 #endif

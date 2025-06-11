@@ -167,5 +167,9 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 
 }
 
+void move(float x_axis, float y_axis, int status, bool* invert){
+
+}
+
 
 #endif
