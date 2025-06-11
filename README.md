@@ -12,3 +12,9 @@
 - Thư mục robot brain là hàm chính, nếu muốn thêm feather vào thì nhớ tạo một file mới hoặc tạo một brand mới và ko merge với brand chính.
 - Cắm các dây theo thứ tự và nạp code vào chạy.
 - Lưu ý : Nhớ rút cổng nhận ps2 trên board khi nạp code cũng như khi reset code.
+
+## Librarys need:
+- https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library ( Adafruit PCA9685 ).
+- https://github.com/makerviet/Arduino-PS2X-ESP32-Makerbot (PS2)
+- https://github.com/cvmanjoo/RTC (time)
+- ArduinoBIOS library.
