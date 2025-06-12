@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
+#include "time_control.h"
 
 #include <vector>
 
@@ -11,17 +12,27 @@
 #define max_power 2025
 #define STEP 100
 
+// config robot
 #define MIN_POWER 0
 #define MAX_POWER 4096
 #define LEVEL 10
+#define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn LEVEL 
+#define when_to_rotate 0.9 // khi nào robot nên xoay
+#define CHANGE_PULL 1
+#define BRAKE 3
 
 #define LEFT 0
 #define RIGHT 1
 
+//khai báo chân pin
 #define LEFT_PIN_1 8 // đầu dương
 #define LEFT_PIN_2 9
 #define RIGHT_PIN_1 10 // đầu dương
 #define RIGHT_PIN_2 11
+
+int current_power_left = LEVEL, current_power_right = LEVEL;
+int TIME_PULL = 0, NEW_TIME_PULL = 0;
+bool already_pull = false;
 
 struct PIN{
   int pin1;
@@ -209,9 +220,57 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 }
 
 void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPull){
+  int new_power_left = current_power_left, new_power_right = current_power_right;
   if(robot_status == 2 && isPull){
-
+    if(already_pull){
+      NEW_TIME_PULL = TIME_SECS;
+      if(NEW_TIME_PULL - TIME_PULL == CHANGE_PULL){
+        //tăng tốc +1 ở đây
+        TIME_PULL = TIME_SECS;
+      }
+    }
+    else{
+      new_power_left += 1;
+      new_power_right += 1;
+      already_pull = true;
+      TIME_PULL = TIME_SECS;
+    }
   }
+  // if(robot_status == 0){
+  //   if (x_axis >= when_to_rotate) // rotate right
+  //   else if (x_axis <= -when_to_rotate) // rotate left
+  //   else{
+  //     // đứng yên
+  //   }
+  // }
+  if (robot_status == -1){
+    if(current_power_left == current_power_right && current_power_left == LEVEL){
+      bool temp = *invert;
+      if(temp) temp = false;
+      else temp = true;
+      *invert = temp;
+      delay(500);
+    }
+    else{
+      if(*invert){
+        new_power_left += BRAKE;
+        new_power_right += BRAKE;
+        if(new_power_left > LEVEL) new_power_left = LEVEL;
+        if(new_power_right > LEVEL) new_power_right = LEVEL;
+      }
+      else{
+        new_power_left -= BRAKE;
+        new_power_right -= BRAKE;
+        if(new_power_left < LEVEL) new_power_left = LEVEL;
+        if(new_power_right < LEVEL) new_power_right = LEVEL;
+      }
+    }
+  }
+
+  if(robot_status != 2){
+    already_pull = false;
+  }
+
 }
 
 

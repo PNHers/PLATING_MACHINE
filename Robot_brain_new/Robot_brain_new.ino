@@ -16,14 +16,14 @@
 #define IDLE 0.15 // stand
 #define ALCT 0.9 // pull
 
+#define time_to_pull 1
+
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 float x_axis = 0, y_axis = 0;
-
 float oldLeft = 0, oldRight = 0;
-
 int robot_status = 0, old_STATUS = 0;
-
 bool invert = false, pull = false;
+int TIME = 0, NEW_TIME = 0;
 
 void check_status(float y_axis, bool invert){
   if(invert) y_axis *= -1;
@@ -32,10 +32,17 @@ void check_status(float y_axis, bool invert){
     if (y_axis <= IDLE) robot_status = STAND;
     else if(y_axis >= ALCT && robot_status != 2){
        robot_status = PULL;
-       rtc.setTime(0, 0, 0);
+       TIME = TIME_SECS;
     }
     else if(y_axis > IDLE && y_axis < ALCT) robot_status = HOLD;
   }
+  if(TIME){
+    NEW_TIME = TIME_SECS;
+    if(NEW_TIME - TIME == time_to_pull){
+      TIME = 0;
+      pull = true;
+    }
+  } else pull = false;
 }
 
 
@@ -58,20 +65,18 @@ void setup() {
 }
 
 void loop() {
-  position_of_console(&x_axis, &y_axis);
-  if(robot_status != 2) pull = false;
-  check_status(y_axis, invert);
-  // Serial.println(robot_status);
-  if(robot_status == 2 && !pull){
-    if(a_seconds(1)) pull = true;
-  }
+  tick_timer();
+  // position_of_console(&x_axis, &y_axis);
+  // if(robot_status != 2) pull = false;
+  // check_status(y_axis, invert);
+  // // Serial.println(robot_status);
+  // if(robot_status == 2 && !pull){
+  //   if(a_seconds(1)) pull = true;
+  // }
+
   //move(x_axis, y_axis, robot_status, &invert);
   //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   // oldLeft = left_motor; oldRight = right_motor;
   //delay(1000);
-<<<<<<< HEAD
-
-=======
-  Serial.println(rtc.getSeconds());
->>>>>>> 923c208f1d64d3e0f114519a4d130de270f69234
+  Serial.println(TIME_SECS);
 }
