@@ -11,6 +11,26 @@
 #define max_power 2025
 #define STEP 100
 
+#define MIN_POWER 0
+#define MAX_POWER 4096
+#define LEVEL 10
+
+#define LEFT 0
+#define RIGHT 1
+
+#define LEFT_PIN_1 8 // đầu dương
+#define LEFT_PIN_2 9
+#define RIGHT_PIN_1 10 // đầu dương
+#define RIGHT_PIN_2 11
+
+struct PIN{
+  int pin1;
+  int pin2;
+};
+
+std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(LEVEL * 2 + 2, 0)); //lưu mức năng lượng
+std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(LEVEL * 2 + 2, {0, 0})); //lưu chân pin
+
 struct Rotate{
   int power;
   int pin1;
@@ -29,6 +49,27 @@ void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn gi�
   a = b;
   b = temp;
 }
+
+void Div_level(){ // lưu các giá trị vào ma trận
+  int temp = (MAX_POWER - MIN_POWER) / LEVEL;
+  for(int i = 1; i <= LEVEL; i++){
+    POWER_LEVEL[LEFT][i + LEVEL] = POWER_LEVEL[LEFT][i + LEVEL - 1] + temp;
+    POWER_LEVEL[RIGHT][i + LEVEL] = POWER_LEVEL[RIGHT][i + LEVEL - 1] + temp;
+    MOTOR_PIN[LEFT][i + LEVEL] = {LEFT_PIN_1, LEFT_PIN_2};
+    MOTOR_PIN[RIGHT][i + LEVEL] = {RIGHT_PIN_1, RIGHT_PIN_2};
+  }
+  int k = LEVEL + LEVEL;
+  for(int i = 0; i < LEVEL; i++){
+    POWER_LEVEL[LEFT][i] = POWER_LEVEL[LEFT][k];
+    POWER_LEVEL[RIGHT][i] = POWER_LEVEL[RIGHT][k];
+    k--;
+    MOTOR_PIN[LEFT][i] = {LEFT_PIN_2, LEFT_PIN_1};
+    MOTOR_PIN[RIGHT][i] = {RIGHT_PIN_2, RIGHT_PIN_1};
+  }
+  POWER_LEVEL[LEFT][0] = POWER_LEVEL[RIGHT][0] = MAX_POWER;
+  POWER_LEVEL[LEFT][LEVEL + LEVEL] = POWER_LEVEL[RIGHT][LEVEL + LEVEL] = MAX_POWER;
+}
+
 // anh dung dep trai
 void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver* pwm){
   if (motor_info.power < 0){return ;}
@@ -167,9 +208,12 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 
 }
 
-void move(float x_axis, float y_axis, int status, bool* invert){
+void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPull){
+  if(robot_status == 2 && isPull){
 
+  }
 }
+
 
 
 #endif
