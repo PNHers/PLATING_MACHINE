@@ -14,7 +14,7 @@
 // config robot
 #define MIN_POWER 0
 #define MAX_POWER 4096
-#define LEVEL 10
+#define LEVEL 5
 #define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn LEVEL 
 #define when_to_rotate 0.9 // khi nào robot nên xoay
 #define CHANGE_PULL 1
@@ -225,7 +225,8 @@ void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPul
   if(abs(x_axis) >= when_to_rotate) is_rotate = true;
   else is_rotate = false;
   NEW_TIME_PULL = *TIME_SECS;
-  if(isPull) Serial.println("YES?");
+
+  if(robot_status == 1)
   if(robot_status == 2 && isPull){
     if(already_pull){
       if(NEW_TIME_PULL - TIME_PULL >= CHANGE_PULL){
