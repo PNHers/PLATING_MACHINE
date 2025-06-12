@@ -38,7 +38,7 @@ void check_status(float y_axis, bool invert){
   }
   if(TIME){
     NEW_TIME = TIME_SECS;
-    if(NEW_TIME - TIME == time_to_pull){
+    if(NEW_TIME - TIME >= time_to_pull){
       TIME = 0;
       pull = true;
     }
@@ -73,9 +73,11 @@ void loop() {
   if(robot_status == 2 && !pull){
     if(a_seconds(1)) pull = true;
   }
-  move(x_axis, y_axis, robot_status, &invert, pull);
+  int TIMES = get_time();
+  Serial.println(TIMES);
+  move(x_axis, y_axis, robot_status, &invert, pull, &TIMES);
   //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   // oldLeft = left_motor; oldRight = right_motor;
   // delay(50);
-
+  delay(10);
 }

@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
-#include "time_control.h"
 
 #include <vector>
 
@@ -220,25 +219,25 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 
 }
 
-void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPull){
+void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPull, int* TIME_SECS){
   int new_power_left = current_power_left, new_power_right = current_power_right;
-
+  if(!isPull && already_pull) isPull = true;
   if(abs(x_axis) >= when_to_rotate) is_rotate = true;
   else is_rotate = false;
-
-  NEW_TIME_PULL = get_time();
+  NEW_TIME_PULL = *TIME_SECS;
+  if(isPull) Serial.println("YES?");
   if(robot_status == 2 && isPull){
     if(already_pull){
       if(NEW_TIME_PULL - TIME_PULL >= CHANGE_PULL){
         if(*invert){
           new_power_left -= 1;
           new_power_right -= 1;
-          TIME_PULL = get_time();
+          TIME_PULL = *TIME_SECS;
         }
         else{
           new_power_left += 1;
           new_power_right += 1;
-          TIME_PULL = get_time();
+          TIME_PULL = *TIME_SECS;
         }
         
       }
@@ -253,7 +252,7 @@ void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPul
         new_power_right += 1;
       }
       already_pull = true;
-      TIME_PULL = get_time();
+      TIME_PULL = *TIME_SECS;
     }
   }
   if(robot_status == 0 && current_power_left == current_power_right && current_power_left == LEVEL && is_rotate){
@@ -310,6 +309,8 @@ void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPul
 
   if(new_power_left > MAX_LEVEL) new_power_left = MAX_LEVEL;
   if(new_power_right > MAX_LEVEL) new_power_right = MAX_LEVEL;  
+  if(new_power_left < 0) new_power_left = 0;
+  if(new_power_right < 0) new_power_right = 0;  
 
   current_power_left = new_power_left;
   current_power_right = new_power_right;
