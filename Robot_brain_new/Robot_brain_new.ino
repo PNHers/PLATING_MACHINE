@@ -69,5 +69,9 @@ void loop() {
   //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   // oldLeft = left_motor; oldRight = right_motor;
   //delay(1000);
+<<<<<<< HEAD
 
+=======
+  Serial.println(rtc.getSeconds());
+>>>>>>> 923c208f1d64d3e0f114519a4d130de270f69234
 }
