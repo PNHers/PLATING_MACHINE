@@ -1,6 +1,6 @@
+#include "time_control.h"
 #include "RotateMotor.h"
 #include "ps2_controler.h"
-#include "time_control.h"
 
 #define motorA1 8 // đầu dương
 #define motorA2 9
@@ -13,8 +13,8 @@
 #define PULL 2
 #define BACK -1
 
-#define IDLE 0.15 // stand
-#define ALCT 0.9 // pull
+#define IDLE 0.1 // stand
+#define ALCT 0.95 // pull
 
 #define time_to_pull 1
 
@@ -57,26 +57,25 @@ void setup() {
   Serial.println("Waiting for setup.....");
   delay(2000);
   
-  setup_timer();
-  //setupPS2();
+  setupPS2();
   Div_level();
 
   Serial.println("Setup done!");
+  setup_timer();
 }
 
 void loop() {
   tick_timer();
-  // position_of_console(&x_axis, &y_axis);
-  // if(robot_status != 2) pull = false;
-  // check_status(y_axis, invert);
-  // // Serial.println(robot_status);
-  // if(robot_status == 2 && !pull){
-  //   if(a_seconds(1)) pull = true;
-  // }
-
-  //move(x_axis, y_axis, robot_status, &invert);
+  position_of_console(&x_axis, &y_axis);
+  if(robot_status != 2) pull = false;
+  check_status(y_axis, invert);
+  Serial.println(robot_status);
+  if(robot_status == 2 && !pull){
+    if(a_seconds(1)) pull = true;
+  }
+  move(x_axis, y_axis, robot_status, &invert, pull);
   //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   // oldLeft = left_motor; oldRight = right_motor;
-  //delay(1000);
-  Serial.println(TIME_SECS);
+  // delay(50);
+
 }

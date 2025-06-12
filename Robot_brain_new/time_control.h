@@ -9,7 +9,7 @@ DS1307 rtc;
 
 int new_time = 0, base_time = 0;
 
-long TIME_SECS = 0;
+int TIME_SECS = 0;
 
 void setup_timer(){
   if(!rtc.begin()){
@@ -24,7 +24,7 @@ void setup_timer(){
 
 bool a_seconds(int set_time){
   new_time = rtc.getSeconds();
-  if(new_time - base_time == set_time) {
+  if(new_time - base_time >= set_time) {
     rtc.setTime(0, 0, 0);
     return true;
   }
@@ -33,6 +33,10 @@ bool a_seconds(int set_time){
 
 void tick_timer(){
   if(a_seconds(1)) TIME_SECS += 1;
+}
+
+int get_time(){
+  return TIME_SECS;
 }
 
 #endif

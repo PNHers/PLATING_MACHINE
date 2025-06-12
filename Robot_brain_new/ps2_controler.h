@@ -110,10 +110,10 @@ void setupPS2() {
   {
     delay(1000); // đợi 1 giây 
     // cài đặt chân và các chế độ: GamePad
-    error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, false, false); 
+    error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, true, false); 
     Serial.print("."); 
     if(!error) //kiểm tra nếu tay cầm đã kết nối thành công 
-    break; // thoát khỏi vòng lặp 
+    break; // thoát khỏi vòng lặp  
   } 
   
 }

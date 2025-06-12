@@ -30,9 +30,10 @@
 #define RIGHT_PIN_1 10 // đầu dương
 #define RIGHT_PIN_2 11
 
+int MAX_LEVEL = LEVEL + LEVEL;
 int current_power_left = LEVEL, current_power_right = LEVEL;
 int TIME_PULL = 0, NEW_TIME_PULL = 0;
-bool already_pull = false;
+bool already_pull = false, is_rotate = false;
 
 struct PIN{
   int pin1;
@@ -221,35 +222,69 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 
 void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPull){
   int new_power_left = current_power_left, new_power_right = current_power_right;
+
+  if(abs(x_axis) >= when_to_rotate) is_rotate = true;
+  else is_rotate = false;
+
+  NEW_TIME_PULL = get_time();
   if(robot_status == 2 && isPull){
     if(already_pull){
-      NEW_TIME_PULL = TIME_SECS;
-      if(NEW_TIME_PULL - TIME_PULL == CHANGE_PULL){
-        //tăng tốc +1 ở đây
-        TIME_PULL = TIME_SECS;
+      if(NEW_TIME_PULL - TIME_PULL >= CHANGE_PULL){
+        if(*invert){
+          new_power_left -= 1;
+          new_power_right -= 1;
+          TIME_PULL = get_time();
+        }
+        else{
+          new_power_left += 1;
+          new_power_right += 1;
+          TIME_PULL = get_time();
+        }
+        
       }
     }
-    else{
-      new_power_left += 1;
-      new_power_right += 1;
+    else if (!already_pull){
+      if(*invert){
+        new_power_left -= 1;
+        new_power_right -= 1;
+      }
+      else{
+        new_power_left += 1;
+        new_power_right += 1;
+      }
       already_pull = true;
-      TIME_PULL = TIME_SECS;
+      TIME_PULL = get_time();
     }
   }
-  // if(robot_status == 0){
-  //   if (x_axis >= when_to_rotate) // rotate right
-  //   else if (x_axis <= -when_to_rotate) // rotate left
-  //   else{
-  //     // đứng yên
-  //   }
-  // }
+  if(robot_status == 0 && current_power_left == current_power_right && current_power_left == LEVEL && is_rotate){
+    if(*invert) *invert = false;
+    if (x_axis >= when_to_rotate){ // rotate right
+      new_power_left += MAX_ROTATE_SPEED;
+      new_power_right -= MAX_ROTATE_SPEED;
+    }
+    else if (x_axis <= -when_to_rotate){ // rotate left
+      new_power_left -= MAX_ROTATE_SPEED;
+      new_power_right += MAX_ROTATE_SPEED;
+    }
+    else{
+      // đứng yên
+      new_power_left = new_power_right = LEVEL;
+    }
+  }
+  if(!robot_status && !is_rotate){
+    if(new_power_left > LEVEL) new_power_left -= 1;
+    if(new_power_right > LEVEL) new_power_right -= 1;
+    if(new_power_left < LEVEL) new_power_left += 1;
+    if(new_power_right < LEVEL) new_power_right += 1;
+    delay(100);
+  }
   if (robot_status == -1){
     if(current_power_left == current_power_right && current_power_left == LEVEL){
       bool temp = *invert;
       if(temp) temp = false;
       else temp = true;
       *invert = temp;
-      delay(500);
+      delay(100);
     }
     else{
       if(*invert){
@@ -257,20 +292,35 @@ void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPul
         new_power_right += BRAKE;
         if(new_power_left > LEVEL) new_power_left = LEVEL;
         if(new_power_right > LEVEL) new_power_right = LEVEL;
+        delay(200);
       }
       else{
         new_power_left -= BRAKE;
         new_power_right -= BRAKE;
         if(new_power_left < LEVEL) new_power_left = LEVEL;
         if(new_power_right < LEVEL) new_power_right = LEVEL;
+        delay(200);
       }
     }
   }
 
-  if(robot_status != 2){
+  if(robot_status != 2 && already_pull){
     already_pull = false;
   }
 
+  if(new_power_left > MAX_LEVEL) new_power_left = MAX_LEVEL;
+  if(new_power_right > MAX_LEVEL) new_power_right = MAX_LEVEL;  
+
+  current_power_left = new_power_left;
+  current_power_right = new_power_right;
+
+  Serial.print(new_power_left);
+  Serial.print(" : ");
+  Serial.println(new_power_right);
+
+  Serial.print(TIME_PULL);
+  Serial.print(" ");
+  Serial.println(NEW_TIME_PULL);
 }
 
 
