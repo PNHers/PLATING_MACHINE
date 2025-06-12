@@ -14,7 +14,7 @@
 // config robot
 #define MIN_POWER 0
 #define MAX_POWER 4096
-#define LEVEL 5
+#define LEVEL 10
 #define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn LEVEL 
 #define when_to_rotate 0.9 // khi nào robot nên xoay
 #define CHANGE_PULL 1
@@ -55,7 +55,7 @@ struct RotateInfo{
   int pin2;
 };
 
-void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn giữ lại đây =)
+void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn giữ lại đây =))  
   int temp = a;
   a = b;
   b = temp;
@@ -226,7 +226,28 @@ void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPul
   else is_rotate = false;
   NEW_TIME_PULL = *TIME_SECS;
 
-  if(robot_status == 1)
+  if(robot_status == 1){
+    if(*invert){
+      if(x_axis < 0){
+        if(current_power_right - current_power_left <= MAX_ROTATE_SPEED) new_power_right += 1;
+        if (new_power_right > LEVEL) new_power_right = LEVEL;
+      }
+      else{
+        if(current_power_left - current_power_right <= MAX_ROTATE_SPEED) new_power_left += 1;
+        if (new_power_left > LEVEL) new_power_left = LEVEL;
+      }
+    }
+    else{
+      if(x_axis < 0){
+        if(current_power_right - current_power_left <= MAX_ROTATE_SPEED) new_power_left -= 1;
+        if (new_power_left < LEVEL) new_power_left = LEVEL;
+      }
+      else{
+        if(current_power_left - current_power_right <= MAX_ROTATE_SPEED) new_power_right -= 1;
+        if (new_power_right < LEVEL) new_power_right = LEVEL;
+      }
+    }
+  }
   if(robot_status == 2 && isPull){
     if(already_pull){
       if(NEW_TIME_PULL - TIME_PULL >= CHANGE_PULL){
@@ -320,9 +341,9 @@ void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPul
   Serial.print(" : ");
   Serial.println(new_power_right);
 
-  Serial.print(TIME_PULL);
-  Serial.print(" ");
-  Serial.println(NEW_TIME_PULL);
+  // Serial.print(TIME_PULL);
+  // Serial.print(" ");
+  // Serial.println(NEW_TIME_PULL);
 }
 
 

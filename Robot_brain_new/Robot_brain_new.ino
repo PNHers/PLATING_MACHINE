@@ -69,12 +69,12 @@ void loop() {
   position_of_console(&x_axis, &y_axis);
   if(robot_status != 2) pull = false;
   check_status(y_axis, invert);
-  Serial.println(robot_status);
+  // Serial.println(robot_status);
   if(robot_status == 2 && !pull){
     if(a_seconds(1)) pull = true;
   }
   int TIMES = get_time();
-  Serial.println(TIMES);
+  // Serial.println(TIMES);
   move(x_axis, y_axis, robot_status, &invert, pull, &TIMES);
   //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   // oldLeft = left_motor; oldRight = right_motor;
