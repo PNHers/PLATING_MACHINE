@@ -1,6 +1,7 @@
 #include "time_control.h"
 #include "RotateMotor.h"
 #include "ps2_controler.h"
+#include "config_button.h"
 
 #define motorA1 8 // đầu dương
 #define motorA2 9
@@ -8,10 +9,6 @@
 #define motorB2 11
 
 // trạng thái
-#define STAND 0
-#define HOLD 1
-#define PULL 2
-#define BACK -1
 
 #define IDLE 0.1 // stand
 #define ALCT 0.95 // pull
@@ -19,30 +16,16 @@
 #define time_to_pull 1
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
-float x_axis = 0, y_axis = 0;
-float oldLeft = 0, oldRight = 0;
-int robot_status = 0, old_STATUS = 0;
-bool invert = false, pull = false;
+
 int TIME = 0, NEW_TIME = 0;
 
-void check_status(float y_axis, bool invert){
+void check_status(float y_axis){
   if(invert) y_axis *= -1;
-  if(y_axis < 0) robot_status = BACK;
-  else{
-    if (y_axis <= IDLE) robot_status = STAND;
-    else if(y_axis >= ALCT && robot_status != 2){
-       robot_status = PULL;
-       TIME = TIME_SECS;
-    }
-    else if(y_axis > IDLE && y_axis < ALCT) robot_status = HOLD;
+  if(abs(y_axis) < IDLE){
+    robot_status = HOLD;
   }
-  if(TIME){
-    NEW_TIME = TIME_SECS;
-    if(NEW_TIME - TIME >= time_to_pull){
-      TIME = 0;
-      pull = true;
-    }
-  } else pull = false;
+  else if (y_axis > 0) robot_status = PULL;
+  else if (y_axis < 0) robot_status = BACK;
 }
 
 
@@ -65,19 +48,29 @@ void setup() {
 }
 
 void loop() {
-  tick_timer();
+  // tick_timer();
+  ps2x.read_gamepad();
+  CONSOL_READ();
   position_of_console(&x_axis, &y_axis);
-  if(robot_status != 2) pull = false;
-  check_status(y_axis, invert);
-  // Serial.println(robot_status);
-  if(robot_status == 2 && !pull){
-    if(a_seconds(1)) pull = true;
-  }
-  int TIMES = get_time();
-  // Serial.println(TIMES);
-  move(x_axis, y_axis, robot_status, &invert, pull, &TIMES);
-  //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
-  // oldLeft = left_motor; oldRight = right_motor;
-  // delay(50);
+  check_status(y_axis);
+
+  // if(robot_status != 2) pull = false;
+  // // Serial.println(robot_status);
+  // if(robot_status == 2 && !pull){
+  //   if(a_seconds(1)) pull = true;
+  // }
+  // int TIMES = get_time();
+  // // Serial.println(TIMES);
+  // move(x_axis, y_axis, robot_status, &invert, pull, &TIMES);
+  // //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
+  // // oldLeft = left_motor; oldRight = right_motor;
+  // // delay(50);
+  move2();
+
+  unpress_button();
+
+  // for(int i = 0; i < MAX_GEAR + MAX_GEAR; i++){
+  //   Serial.println(POWER_LEVEL[LEFT][i]);
+  // }
   delay(10);
 }

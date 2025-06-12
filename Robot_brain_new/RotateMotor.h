@@ -4,43 +4,15 @@
 #include <stdio.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
-
+#include "config_button.h"
 #include <vector>
 
 #define MENSURE_VAULE 0.05 // sai số khi joystick để ở vị trí ban đầu
 #define max_power 2025
 #define STEP 100
 
-// config robot
-#define MIN_POWER 0
-#define MAX_POWER 4096
-#define LEVEL 10
-#define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn LEVEL 
-#define when_to_rotate 0.9 // khi nào robot nên xoay
-#define CHANGE_PULL 1
-#define BRAKE 3
-
-#define LEFT 0
-#define RIGHT 1
-
-//khai báo chân pin
-#define LEFT_PIN_1 8 // đầu dương
-#define LEFT_PIN_2 9
-#define RIGHT_PIN_1 10 // đầu dương
-#define RIGHT_PIN_2 11
-
-int MAX_LEVEL = LEVEL + LEVEL;
-int current_power_left = LEVEL, current_power_right = LEVEL;
-int TIME_PULL = 0, NEW_TIME_PULL = 0;
+int MAX_LEVEL = MAX_GEAR + MAX_GEAR;
 bool already_pull = false, is_rotate = false;
-
-struct PIN{
-  int pin1;
-  int pin2;
-};
-
-std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(LEVEL * 2 + 2, 0)); //lưu mức năng lượng
-std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(LEVEL * 2 + 2, {0, 0})); //lưu chân pin
 
 struct Rotate{
   int power;
@@ -62,15 +34,15 @@ void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn gi�
 }
 
 void Div_level(){ // lưu các giá trị vào ma trận
-  int temp = (MAX_POWER - MIN_POWER) / LEVEL;
-  for(int i = 1; i <= LEVEL; i++){
-    POWER_LEVEL[LEFT][i + LEVEL] = POWER_LEVEL[LEFT][i + LEVEL - 1] + temp;
-    POWER_LEVEL[RIGHT][i + LEVEL] = POWER_LEVEL[RIGHT][i + LEVEL - 1] + temp;
-    MOTOR_PIN[LEFT][i + LEVEL] = {LEFT_PIN_1, LEFT_PIN_2};
-    MOTOR_PIN[RIGHT][i + LEVEL] = {RIGHT_PIN_1, RIGHT_PIN_2};
+  int temp = (MAX_POWER - MIN_POWER) / MAX_GEAR;
+  for(int i = 1; i <= MAX_GEAR; i++){
+    POWER_LEVEL[LEFT][i + MAX_GEAR] = POWER_LEVEL[LEFT][i + MAX_GEAR - 1] + temp;
+    POWER_LEVEL[RIGHT][i + MAX_GEAR] = POWER_LEVEL[RIGHT][i + MAX_GEAR - 1] + temp;
+    MOTOR_PIN[LEFT][i + MAX_GEAR] = {LEFT_PIN_1, LEFT_PIN_2};
+    MOTOR_PIN[RIGHT][i + MAX_GEAR] = {RIGHT_PIN_1, RIGHT_PIN_2};
   }
-  int k = LEVEL + LEVEL;
-  for(int i = 0; i < LEVEL; i++){
+  int k = MAX_GEAR + MAX_GEAR;
+  for(int i = 0; i < MAX_GEAR; i++){
     POWER_LEVEL[LEFT][i] = POWER_LEVEL[LEFT][k];
     POWER_LEVEL[RIGHT][i] = POWER_LEVEL[RIGHT][k];
     k--;
@@ -78,7 +50,8 @@ void Div_level(){ // lưu các giá trị vào ma trận
     MOTOR_PIN[RIGHT][i] = {RIGHT_PIN_2, RIGHT_PIN_1};
   }
   POWER_LEVEL[LEFT][0] = POWER_LEVEL[RIGHT][0] = MAX_POWER;
-  POWER_LEVEL[LEFT][LEVEL + LEVEL] = POWER_LEVEL[RIGHT][LEVEL + LEVEL] = MAX_POWER;
+  POWER_LEVEL[LEFT][MAX_GEAR + MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR + MAX_GEAR] = MAX_POWER;
+  power_lift = temp / 2;
 }
 
 // anh dung dep trai
@@ -219,133 +192,156 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 
 }
 
-void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPull, int* TIME_SECS){
-  int new_power_left = current_power_left, new_power_right = current_power_right;
-  if(!isPull && already_pull) isPull = true;
-  if(abs(x_axis) >= when_to_rotate) is_rotate = true;
-  else is_rotate = false;
-  NEW_TIME_PULL = *TIME_SECS;
+// void move(float x_axis, float y_axis, int robot_status, bool* invert, bool isPull, int* TIME_SECS){
+//   int new_power_left = current_power_left, new_power_right = current_power_right;
+//   if(!isPull && already_pull) isPull = true;
+//   if(abs(x_axis) >= when_to_rotate) is_rotate = true;
+//   else is_rotate = false;
+//   // NEW_MAX_GEAR = *TIME_SECS;
 
-  if(robot_status == 1){
-    if(*invert){
-      if(x_axis < 0){
-        if(current_power_right - current_power_left <= MAX_ROTATE_SPEED) new_power_right += 1;
-        if (new_power_right > LEVEL) new_power_right = LEVEL;
-      }
-      else{
-        if(current_power_left - current_power_right <= MAX_ROTATE_SPEED) new_power_left += 1;
-        if (new_power_left > LEVEL) new_power_left = LEVEL;
-      }
-    }
-    else{
-      if(x_axis < 0){
-        if(current_power_right - current_power_left <= MAX_ROTATE_SPEED) new_power_left -= 1;
-        if (new_power_left < LEVEL) new_power_left = LEVEL;
-      }
-      else{
-        if(current_power_left - current_power_right <= MAX_ROTATE_SPEED) new_power_right -= 1;
-        if (new_power_right < LEVEL) new_power_right = LEVEL;
-      }
-    }
-  }
-  if(robot_status == 2 && isPull){
-    if(already_pull){
-      if(NEW_TIME_PULL - TIME_PULL >= CHANGE_PULL){
-        if(*invert){
-          new_power_left -= 1;
-          new_power_right -= 1;
-          TIME_PULL = *TIME_SECS;
-        }
-        else{
-          new_power_left += 1;
-          new_power_right += 1;
-          TIME_PULL = *TIME_SECS;
-        }
+//   if(robot_status == 1){
+//     if(*invert){
+//       if(x_axis < 0){
+//         if(current_power_right - current_power_left <= MAX_ROTATE_SPEED) new_power_right += 1;
+//         if (new_power_right > MAX_GEAR) new_power_right = LEVEL;
+//       }
+//       else{
+//         if(current_power_left - current_power_right <= MAX_ROTATE_SPEED) new_power_left += 1;
+//         if (new_power_left > MAX_GEAR) new_power_left = LEVEL;
+//       }
+//     }
+//     else{
+//       if(x_axis < 0){
+//         if(current_power_right - current_power_left <= MAX_ROTATE_SPEED) new_power_left -= 1;
+//         if (new_power_left < MAX_GEAR) new_power_left = LEVEL;
+//       }
+//       else{
+//         if(current_power_left - current_power_right <= MAX_ROTATE_SPEED) new_power_right -= 1;
+//         if (new_power_right < MAX_GEAR) new_power_right = LEVEL;
+//       }
+//     }
+//   }
+//   if(robot_status == 2 && isPull){
+//     if(already_pull){
+//       if(NEW_MAX_GEAR - MAX_GEAR >= CHANGE_PULL){
+//         if(*invert){
+//           new_power_left -= 1;
+//           new_power_right -= 1;
+//           MAX_GEAR = *TIME_SECS;
+//         }
+//         else{
+//           new_power_left += 1;
+//           new_power_right += 1;
+//           MAX_GEAR = *TIME_SECS;
+//         }
         
-      }
-    }
-    else if (!already_pull){
-      if(*invert){
-        new_power_left -= 1;
-        new_power_right -= 1;
-      }
-      else{
-        new_power_left += 1;
-        new_power_right += 1;
-      }
-      already_pull = true;
-      TIME_PULL = *TIME_SECS;
-    }
-  }
-  if(robot_status == 0 && current_power_left == current_power_right && current_power_left == LEVEL && is_rotate){
-    if(*invert) *invert = false;
-    if (x_axis >= when_to_rotate){ // rotate right
-      new_power_left += MAX_ROTATE_SPEED;
-      new_power_right -= MAX_ROTATE_SPEED;
-    }
-    else if (x_axis <= -when_to_rotate){ // rotate left
-      new_power_left -= MAX_ROTATE_SPEED;
-      new_power_right += MAX_ROTATE_SPEED;
-    }
-    else{
-      // đứng yên
-      new_power_left = new_power_right = LEVEL;
-    }
-  }
-  if(!robot_status && !is_rotate){
-    if(new_power_left > LEVEL) new_power_left -= 1;
-    if(new_power_right > LEVEL) new_power_right -= 1;
-    if(new_power_left < LEVEL) new_power_left += 1;
-    if(new_power_right < LEVEL) new_power_right += 1;
-    delay(100);
-  }
-  if (robot_status == -1){
-    if(current_power_left == current_power_right && current_power_left == LEVEL){
-      bool temp = *invert;
-      if(temp) temp = false;
-      else temp = true;
-      *invert = temp;
-      delay(100);
-    }
-    else{
-      if(*invert){
-        new_power_left += BRAKE;
-        new_power_right += BRAKE;
-        if(new_power_left > LEVEL) new_power_left = LEVEL;
-        if(new_power_right > LEVEL) new_power_right = LEVEL;
-        delay(200);
-      }
-      else{
-        new_power_left -= BRAKE;
-        new_power_right -= BRAKE;
-        if(new_power_left < LEVEL) new_power_left = LEVEL;
-        if(new_power_right < LEVEL) new_power_right = LEVEL;
-        delay(200);
-      }
-    }
-  }
+//       }
+//     }
+//     else if (!already_pull){
+//       if(*invert){
+//         new_power_left -= 1;
+//         new_power_right -= 1;
+//       }
+//       else{
+//         new_power_left += 1;
+//         new_power_right += 1;
+//       }
+//       already_pull = true;
+//       MAX_GEAR = *TIME_SECS;
+//     }
+//   }
+//   if(robot_status == 0 && current_power_left == current_power_right && current_power_left == MAX_GEAR && is_rotate){
+//     if(*invert) *invert = false;
+//     if (x_axis >= when_to_rotate){ // rotate right
+//       new_power_left += MAX_ROTATE_SPEED;
+//       new_power_right -= MAX_ROTATE_SPEED;
+//     }
+//     else if (x_axis <= -when_to_rotate){ // rotate left
+//       new_power_left -= MAX_ROTATE_SPEED;
+//       new_power_right += MAX_ROTATE_SPEED;
+//     }
+//     else{
+//       // đứng yên
+//       new_power_left = new_power_right = MAX_GEAR;
+//     }
+//   }
+//   if(!robot_status && !is_rotate){
+//     if(new_power_left > MAX_GEAR) new_power_left -= 1;
+//     if(new_power_right > MAX_GEAR) new_power_right -= 1;
+//     if(new_power_left < MAX_GEAR) new_power_left += 1;
+//     if(new_power_right < MAX_GEAR) new_power_right += 1;
+//     delay(100);
+//   }
+//   if (robot_status == -1){
+//     if(current_power_left == current_power_right && current_power_left == MAX_GEAR){
+//       bool temp = *invert;
+//       if(temp) temp = false;
+//       else temp = true;
+//       *invert = temp;
+//       delay(100);
+//     }
+//     else{
+//       if(*invert){
+//         new_power_left += BRAKE;
+//         new_power_right += BRAKE;
+//         if(new_power_left > LEVEL) new_power_left = LEVEL;
+//         if(new_power_right > LEVEL) new_power_right = LEVEL;
+//         delay(200);
+//       }
+//       else{
+//         new_power_left -= BRAKE;
+//         new_power_right -= BRAKE;
+//         if(new_power_left < LEVEL) new_power_left = LEVEL;
+//         if(new_power_right < LEVEL) new_power_right = LEVEL;
+//         delay(200);
+//       }
+//     }
+//   }
 
-  if(robot_status != 2 && already_pull){
-    already_pull = false;
-  }
+//   if(robot_status != 2 && already_pull){
+//     already_pull = false;
+//   }
 
-  if(new_power_left > MAX_LEVEL) new_power_left = MAX_LEVEL;
-  if(new_power_right > MAX_LEVEL) new_power_right = MAX_LEVEL;  
-  if(new_power_left < 0) new_power_left = 0;
-  if(new_power_right < 0) new_power_right = 0;  
+//   if(new_power_left > MAX_LEVEL) new_power_left = MAX_LEVEL;
+//   if(new_power_right > MAX_LEVEL) new_power_right = MAX_LEVEL;  
+//   if(new_power_left < 0) new_power_left = 0;
+//   if(new_power_right < 0) new_power_right = 0;  
 
-  current_power_left = new_power_left;
-  current_power_right = new_power_right;
+//   current_power_left = new_power_left;
+//   current_power_right = new_power_right;
+//   Serial.print(new_power_left);
+//   Serial.print(" : ");
+//   Serial.println(new_power_right);
 
-  Serial.print(new_power_left);
-  Serial.print(" : ");
-  Serial.println(new_power_right);
+//   // Serial.print(MAX_GEAR);
+//   // Serial.print(" ");
+//   // Serial.println(NEW_MAX_GEAR);
+// }
 
-  // Serial.print(TIME_PULL);
-  // Serial.print(" ");
-  // Serial.println(NEW_TIME_PULL);
+void move2(){
+   int new_power_left = current_power_left, new_power_right = current_power_right;
+   Serial.println(CURRENT_GEAR);
+   if(robot_status == 1){
+      new_power_left += power_lift * y_axis;
+      new_power_right += power_lift * y_axis;
+      if(new_power_left > POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR]) new_power_left = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR];
+      if(new_power_right > POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]) new_power_right = POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR];
+      delay(200);
+   }
+   if(robot_status == -1){
+      new_power_left += power_lift * y_axis;
+      new_power_right += power_lift * y_axis;
+      if(new_power_left < 0) new_power_left = 0;
+      if(new_power_right < 0) new_power_right = 0;
+      delay(200);
+   }
+   Serial.print(new_power_left);
+   Serial.print(" ");
+   Serial.println(new_power_right);
+
+   current_power_left = new_power_left;
+   current_power_right = new_power_right;
 }
-
 
 
 #endif

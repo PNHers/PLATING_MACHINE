@@ -4,12 +4,17 @@
 
 #include <Wire.h> //thư viện I2c của Arduino, do PCA9685 sử dụng chuẩn giao tiếp i2c nên thư viện này bắt buộc phải khai báo 
 #include <PS2X_lib.h> // Khai báo thư viện
+#include "config_button.h"
 
 //Định nghĩa các chân điều khiển 
 #define PS2_DAT 12 // MISO 
 #define PS2_CMD 13 // MOSI 
 #define PS2_SEL 15 // SS 
 #define PS2_CLK 14 // SLK
+
+#define GEAR_UP PSB_L2
+#define GEAR_DOWN PSB_L1
+#define ZERO_FORCE PSB_L3
 
 const float sai_so = 0.01; // sai số
 
@@ -110,7 +115,7 @@ void setupPS2() {
   {
     delay(1000); // đợi 1 giây 
     // cài đặt chân và các chế độ: GamePad
-    error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, true, false); 
+    error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, false, false); 
     Serial.print("."); 
     if(!error) //kiểm tra nếu tay cầm đã kết nối thành công 
     break; // thoát khỏi vòng lặp  
@@ -119,21 +124,52 @@ void setupPS2() {
 }
 
 void position_of_console(float* x_axis, float* y_axis) {
-  // put your main code here, to run repeatedly:
   ps2x.read_gamepad(); // gọi hàm để đọc tay điều khiển 
-
-  // Serial.print(ps2x.Analog(PSS_LX));
-  // Serial.print(" ");
-  // Serial.println(ps2x.Analog(PSS_LY));
-  
-  float handled_psx = (ps2x.Analog(PSS_LX)  - 127.5) / 127.5; 
+  float handled_psx = (ps2x.Analog(PSS_RX)  - 127.5) / 127.5; 
   float handled_psy = (ps2x.Analog(PSS_LY)  - 127.5) / 127.5; 
+  // rotate(handled_psx, -handled_psy, x_axis, y_axis);
+  *x_axis = handled_psx;
+  *y_axis = -handled_psy;
+}
 
-  // Serial.print(handled_psx);
-  // Serial.print(" ");
-  // Serial.println(handled_psy);
+void unpress_button(){
+  if(!ps2x.Button(GEAR_UP) && gear_up){
+    gear_up = false;
+  }
+  if(!ps2x.Button(GEAR_DOWN) && gear_down){
+    gear_down = false;
+  }
+  if(!ps2x.Button(ZERO_FORCE) && zero_force){
+    zero_force = false;
+  }
+  if(!ps2x.Button(REVERSE) && is_reverse){
+    is_reverse = false;
+  }
+}
 
-  rotate(handled_psx, -handled_psy, x_axis, y_axis);
+void CONSOL_READ(){
+  if(ps2x.Button(GEAR_UP) && !gear_up){
+    CURRENT_GEAR += 1;
+    if(CURRENT_GEAR > MAX_GEAR) CURRENT_GEAR = MAX_GEAR;
+    Serial.println(CURRENT_GEAR);
+    gear_up = true;
+  }
+  if(ps2x.Button(GEAR_DOWN) && !gear_down){
+    CURRENT_GEAR -= 1;
+    if(CURRENT_GEAR < 0) CURRENT_GEAR = 0;
+    Serial.println(CURRENT_GEAR);
+    gear_down = true;
+  }
+  if(ps2x.Button(ZERO_FORCE) && !zero_force){
+    CURRENT_GEAR = 0;
+    Serial.println(CURRENT_GEAR);
+    zero_force = true;
+  }
+  if(ps2x.Button(REVERSE) && !is_reverse){
+    
+    Serial.println("reverse mode");
+    is_reverse = true;
+  }
 }
 
 #endif
