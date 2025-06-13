@@ -67,8 +67,8 @@ void loop() {
   // // delay(50);
   max_different_rotate = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] * (TURN_RATIO / 100.0); 
   
-  if (!fast_stop) move2();
   if(CURRENT_GEAR == 0) self_rotate();
+  if (!fast_stop && !rotate_left && !rotate_right) move2();
   
   RotateInfo left_motor = {&current_power_left, &new_power_left, left_pin.pin1, left_pin.pin2};
   RotateInfo right_motor = {&current_power_right, &new_power_right, right_pin.pin1, right_pin.pin2};

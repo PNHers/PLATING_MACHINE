@@ -46,7 +46,7 @@ void Div_level(){ // lưu các giá trị vào ma trận
   POWER_LEVEL[LEFT][0] = POWER_LEVEL[RIGHT][0] = MAX_POWER;
   POWER_LEVEL[LEFT][MAX_GEAR + MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR + MAX_GEAR] = MAX_POWER;
   power_lift = temp / 2;
-
+  self_rotate_gap = (MAX_POWER - MIN_POWER) * (SELF_ROTATE_RATIO / 100.0);
 }
 
 // anh dung dep trai
@@ -392,7 +392,62 @@ void move2(){
 }
 
 void self_rotate(){
-
+  left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
+  right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
+  if(abs(x_axis) > when_to_rotate ){
+      if(x_axis > 0 && !rotate_left) {
+        new_power_left += (self_rotate_gap * 0.5) * x_axis;
+        new_power_right += (self_rotate_gap * 0.5) * x_axis;
+        if(new_power_left > self_rotate_gap) new_power_left = self_rotate_gap;
+        if(new_power_right > self_rotate_gap) new_power_right = self_rotate_gap;
+        right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+        rotate_right = true;
+      }
+      if(x_axis < 0 && !rotate_right){
+        new_power_right += (self_rotate_gap * 0.5) * -x_axis;
+        new_power_left += (self_rotate_gap * 0.5) * -x_axis;
+        if(new_power_right > self_rotate_gap) new_power_right = self_rotate_gap;
+        if(new_power_left > self_rotate_gap) new_power_left = self_rotate_gap;
+        left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
+        rotate_left = true;
+      }
+      if (x_axis > 0 && rotate_left){
+        new_power_right -= self_rotate_gap * 0.5;
+        new_power_left -= self_rotate_gap * 0.5;
+        if(new_power_right < 0) new_power_right = 0;
+        if(new_power_left < 0) new_power_left = 0;
+        left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1]; 
+      }
+      if (x_axis < 0 && rotate_right){
+        new_power_left -= self_rotate_gap * 0.5;
+        new_power_right -= self_rotate_gap * 0.5;
+        if(new_power_left < 0) new_power_left = 0;
+        if(new_power_right < 0) new_power_right = 0;
+        right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+      }
+      delay(200);
+   }
+   else{
+      if(rotate_right){
+        new_power_left -= self_rotate_gap * 0.5;
+        new_power_right -= self_rotate_gap * 0.5;
+        if(new_power_left < 0) new_power_left = 0;
+        if(new_power_right < 0) new_power_right = 0;
+        right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+      }
+      else if (rotate_left){
+        new_power_right -= self_rotate_gap * 0.5;
+        new_power_left -= self_rotate_gap * 0.5;
+        if(new_power_right < 0) new_power_right = 0;
+        if(new_power_left < 0) new_power_left = 0;
+        left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
+      }
+      delay(100);
+   }
+   if((rotate_left || rotate_right) && new_power_left == new_power_right && new_power_left == 0){
+      rotate_left = false;
+      rotate_right = false;
+   }
 }
 
 

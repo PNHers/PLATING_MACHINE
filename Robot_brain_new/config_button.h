@@ -24,6 +24,7 @@
 #define CHANGE_PULL 1
 #define BRAKE 3
 #define TURN_RATIO 30 // 30%
+#define SELF_ROTATE_RATIO 50 // 50%
 
 #define LEFT 0
 #define RIGHT 1
@@ -53,10 +54,13 @@ bool zero_force = false;
 bool is_reverse = false;
 bool invert = false; // reverse
 bool fast_stop = false;
+bool rotate_left = false;
+bool rotate_right = false;
 
 int CURRENT_GEAR = 0;
 int robot_status = 0;
 int max_different_rotate = 0;
+int self_rotate_gap = 0;
 int current_power_left = 0, current_power_right = 0;
 int new_power_left = 0, new_power_right = 0;
 
