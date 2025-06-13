@@ -65,6 +65,7 @@ void loop() {
   // //rotate_2_motor(RotateInfo(&oldLeft, &left_motor, 8, 9), RotateInfo(&oldRight, &right_motor, 10, 11), &pwm);
   // // oldLeft = left_motor; oldRight = right_motor;
   // // delay(50);
+  max_different_rotate = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] * (TURN_RATIO / 100.0); 
   move2();
 
   current_power_left = new_power_left;
@@ -73,6 +74,8 @@ void loop() {
   Serial.print(current_power_left);
   Serial.print(" ");
   Serial.println(current_power_right);
+
+  Serial.println(max_different_rotate);
 
   unpress_button();
 

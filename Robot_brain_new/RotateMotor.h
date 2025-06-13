@@ -52,6 +52,7 @@ void Div_level(){ // lưu các giá trị vào ma trận
   POWER_LEVEL[LEFT][0] = POWER_LEVEL[RIGHT][0] = MAX_POWER;
   POWER_LEVEL[LEFT][MAX_GEAR + MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR + MAX_GEAR] = MAX_POWER;
   power_lift = temp / 2;
+
 }
 
 // anh dung dep trai
@@ -355,6 +356,31 @@ void move2(){
       delay(200);
    }
    OVER_GEAR();
+   if(abs(x_axis) > when_to_rotate ){
+      if(x_axis > 0) {
+        new_power_right -= power_lift * x_axis;
+        if (new_power_left - new_power_right > max_different_rotate) new_power_right = new_power_left - max_different_rotate;
+        if (new_power_right < 0) new_power_right = 0;
+      }
+      if(x_axis < 0){
+        new_power_left -= power_lift * -x_axis;
+        if(new_power_right - new_power_left > max_different_rotate) new_power_left = new_power_right - max_different_rotate;
+        if (new_power_left < 0) new_power_left = 0;
+      }
+      delay(200);
+   }
+   else{
+      if (new_power_left > new_power_right){
+        new_power_right += power_lift;
+        if(new_power_right > new_power_left) new_power_right = new_power_left;
+        delay(200);
+      }
+      else if (new_power_left < new_power_right){
+        new_power_left += power_lift;
+        if(new_power_right < new_power_left) new_power_left = new_power_right;
+        delay(200);
+      }
+   }
 }
 
 

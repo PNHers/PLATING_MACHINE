@@ -20,9 +20,10 @@
 #define MAX_POWER 4096
 #define MAX_GEAR 6
 #define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn MAX_GEAR 
-#define when_to_rotate 0.9 // khi nào robot nên xoay
+#define when_to_rotate 0.2 // khi nào robot nên xoay
 #define CHANGE_PULL 1
 #define BRAKE 3
+#define TURN_RATIO 30 // 30%
 
 #define LEFT 0
 #define RIGHT 1
@@ -47,6 +48,7 @@ bool invert = false; // reverse
 
 int CURRENT_GEAR = 0;
 int robot_status = 0;
+int max_different_rotate = 0;
 int current_power_left = 0, current_power_right = 0;
 int new_power_left = 0, new_power_right = 0;
 
