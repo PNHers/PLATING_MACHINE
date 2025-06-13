@@ -73,8 +73,17 @@ void TakeMotorRotate(float* leftMotor, float* rightMotor) {
   // put your main code here, to run repeatedly:
   ps2x.read_gamepad(); // gọi hàm để đọc tay điều khiển 
 
+  // Serial.print(ps2x.Analog(PSS_LX));
+  // Serial.print(" ");
+  // Serial.println(ps2x.Analog(PSS_LY));
+  
+
   float handled_psx = (ps2x.Analog(PSS_LX)  - 127.5) / 127.5; 
   float handled_psy = (ps2x.Analog(PSS_LY)  - 127.5) / 127.5; 
+
+  // Serial.print(handled_psx);
+  // Serial.print(" ");
+  // Serial.println(handled_psy);
 
   rotate(handled_psx, -handled_psy, leftMotor, rightMotor);
 }
