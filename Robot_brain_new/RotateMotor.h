@@ -318,12 +318,22 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 //   // Serial.println(NEW_MAX_GEAR);
 // }
 
-void FAST_MOTOR_STOP(){
-  while(new_power_left != 0 && new_power_right != 0){
+void FAST_MOTOR_STOP(){ // làm motor dừng đột ngột
+  while(new_power_left != 0 || new_power_right != 0){
     if(new_power_left > 0) new_power_left -= power_lift;
     if(new_power_right > 0) new_power_right -= power_lift;
     if(new_power_left < 0) new_power_left = 0;
     if(new_power_right < 0) new_power_right = 0;
+    delay(100);
+  }
+}
+
+void OVER_GEAR(){ // luôn đi đúng tốc độ
+  if(new_power_left > POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] || new_power_right > POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]){
+    new_power_left -= power_lift;
+    new_power_right -= power_lift; 
+    if(new_power_left < POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR]) new_power_left = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR];
+    if(new_power_right < POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]) new_power_right = POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR];
     delay(100);
   }
 }
@@ -344,6 +354,7 @@ void move2(){
       if(new_power_right < 0) new_power_right = 0;
       delay(200);
    }
+   OVER_GEAR();
 }
 
 
