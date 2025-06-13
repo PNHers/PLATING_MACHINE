@@ -111,9 +111,9 @@ void rotate(float x_ps2, float y_ps2, float *x_axis, float *y_axis){
 
 void setupPS2() {
   int error = -1; 
-  for (int i = 0; i < 10; i++) // thử kết nối với tay cầm ps2 trong 10 lần 
+  while(true) // thử kết nối với tay cầm ps2 trong n lần 
   {
-    delay(1000); // đợi 1 giây 
+    delay(500); // đợi 1 giây 
     // cài đặt chân và các chế độ: GamePad
     error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, false, false); 
     Serial.print("."); 
@@ -148,13 +148,13 @@ void unpress_button(){
 }
 
 void CONSOL_READ(){
-  if(ps2x.Button(GEAR_UP) && !gear_up){
+  if(ps2x.Button(GEAR_UP) && !gear_up && !rotate_left && !rotate_right){
     CURRENT_GEAR += 1;
     if(CURRENT_GEAR > MAX_GEAR) CURRENT_GEAR = MAX_GEAR;
     Serial.println(CURRENT_GEAR);
     gear_up = true;
   }
-  if(ps2x.Button(GEAR_DOWN) && !gear_down){
+  if(ps2x.Button(GEAR_DOWN) && !gear_down && !rotate_left && !rotate_right){
     CURRENT_GEAR -= 1;
     if(CURRENT_GEAR < 0) CURRENT_GEAR = 0;
     Serial.println(CURRENT_GEAR);
@@ -171,7 +171,8 @@ void CONSOL_READ(){
     FAST_MOTOR_STOP();
     fast_stop = true;
     CURRENT_GEAR = 0;
-    invert = true;
+    if(invert) invert = false;
+    else invert = true;
     Serial.println("reverse mode");
     is_reverse = true;
   }

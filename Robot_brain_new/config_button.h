@@ -16,15 +16,15 @@
 
 #define IDLE 0.1 // stand
 
-#define MIN_POWER 0
-#define MAX_POWER 4096
-#define MAX_GEAR 6
+#define MIN_POWER 512
+#define MAX_POWER 2048
+#define MAX_GEAR 4
 #define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn MAX_GEAR 
 #define when_to_rotate 0.2 // khi nào robot nên xoay
 #define CHANGE_PULL 1
 #define BRAKE 3
-#define TURN_RATIO 30 // 30%
-#define SELF_ROTATE_RATIO 50 // 50%
+#define TURN_RATIO 40 // %
+#define SELF_ROTATE_RATIO 30 // %
 
 #define LEFT 0
 #define RIGHT 1

@@ -10,9 +10,6 @@
 
 // trạng thái
 
-#define IDLE 0.1 // stand
-#define ALCT 0.95 // pull
-
 #define time_to_pull 1
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
@@ -45,6 +42,7 @@ void setup() {
 
   Serial.println("Setup done!");
   setup_timer();
+
 }
 
 void loop() {
@@ -68,7 +66,7 @@ void loop() {
   max_different_rotate = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] * (TURN_RATIO / 100.0); 
   
   if(CURRENT_GEAR == 0) self_rotate();
-  if (!fast_stop && !rotate_left && !rotate_right) move2();
+  else if (!fast_stop && !rotate_left && !rotate_right) move2();
   
   RotateInfo left_motor = {&current_power_left, &new_power_left, left_pin.pin1, left_pin.pin2};
   RotateInfo right_motor = {&current_power_right, &new_power_right, right_pin.pin1, right_pin.pin2};
@@ -84,8 +82,5 @@ void loop() {
   if(fast_stop) fast_stop = false;
   unpress_button();
 
-  // for(int i = 0; i < MAX_GEAR + MAX_GEAR; i++){
-  //   Serial.println(POWER_LEVEL[LEFT][i]);
-  // }
-  delay(10);
+  delay(50);
 }
