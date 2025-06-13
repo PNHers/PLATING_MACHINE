@@ -48,12 +48,12 @@ void setup() {
 }
 
 void loop() {
+  new_power_left = current_power_left, new_power_right = current_power_right;
   // tick_timer();
   ps2x.read_gamepad();
   CONSOL_READ();
   position_of_console(&x_axis, &y_axis);
   check_status(y_axis);
-
   // if(robot_status != 2) pull = false;
   // // Serial.println(robot_status);
   // if(robot_status == 2 && !pull){
@@ -66,6 +66,13 @@ void loop() {
   // // oldLeft = left_motor; oldRight = right_motor;
   // // delay(50);
   move2();
+
+  current_power_left = new_power_left;
+  current_power_right = new_power_right;
+
+  Serial.print(current_power_left);
+  Serial.print(" ");
+  Serial.println(current_power_right);
 
   unpress_button();
 

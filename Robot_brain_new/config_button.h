@@ -48,6 +48,7 @@ bool invert = false; // reverse
 int CURRENT_GEAR = 0;
 int robot_status = 0;
 int current_power_left = 0, current_power_right = 0;
+int new_power_left = 0, new_power_right = 0;
 
 int power_lift = 0;
 

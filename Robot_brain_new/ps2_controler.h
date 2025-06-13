@@ -162,6 +162,7 @@ void CONSOL_READ(){
   }
   if(ps2x.Button(ZERO_FORCE) && !zero_force){
     CURRENT_GEAR = 0;
+    FAST_MOTOR_STOP();
     Serial.println(CURRENT_GEAR);
     zero_force = true;
   }

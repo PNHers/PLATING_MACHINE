@@ -318,8 +318,17 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 //   // Serial.println(NEW_MAX_GEAR);
 // }
 
+void FAST_MOTOR_STOP(){
+  while(new_power_left != 0 && new_power_right != 0){
+    if(new_power_left > 0) new_power_left -= power_lift;
+    if(new_power_right > 0) new_power_right -= power_lift;
+    if(new_power_left < 0) new_power_left = 0;
+    if(new_power_right < 0) new_power_right = 0;
+    delay(100);
+  }
+}
+
 void move2(){
-   int new_power_left = current_power_left, new_power_right = current_power_right;
    Serial.println(CURRENT_GEAR);
    if(robot_status == 1){
       new_power_left += power_lift * y_axis;
@@ -335,12 +344,6 @@ void move2(){
       if(new_power_right < 0) new_power_right = 0;
       delay(200);
    }
-   Serial.print(new_power_left);
-   Serial.print(" ");
-   Serial.println(new_power_right);
-
-   current_power_left = new_power_left;
-   current_power_right = new_power_right;
 }
 
 
