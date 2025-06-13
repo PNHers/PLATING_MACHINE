@@ -167,7 +167,7 @@ void CONSOL_READ(){
     zero_force = true;
   }
   if(ps2x.Button(REVERSE) && !is_reverse){
-    
+    invert = true;
     Serial.println("reverse mode");
     is_reverse = true;
   }

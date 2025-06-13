@@ -39,6 +39,13 @@ struct PIN{
   int pin2;
 };
 
+struct RotateInfo{
+  int* start;
+  int* end;
+  int pin1;
+  int pin2;
+};
+
 // VARIABLE
 bool gear_up = false;
 bool gear_down = false;
@@ -56,6 +63,7 @@ int power_lift = 0;
 
 float x_axis = 0, y_axis = 0;
 
+PIN left_pin, right_pin;
 
 std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(MAX_GEAR * 2 + 2, 0)); //lưu mức năng lượng
 std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(MAX_GEAR * 2 + 2, {0, 0})); //lưu chân pin

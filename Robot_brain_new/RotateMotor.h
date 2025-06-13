@@ -20,12 +20,6 @@ struct Rotate{
   int pin2;
 };
 
-struct RotateInfo{
-  float* start;
-  float* end;
-  int pin1;
-  int pin2;
-};
 
 void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn giữ lại đây =))  
   int temp = a;
@@ -58,8 +52,8 @@ void Div_level(){ // lưu các giá trị vào ma trận
 // anh dung dep trai
 void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver* pwm){
   if (motor_info.power < 0){return ;}
-  pwm->setPin(motor_info.pin1, motor_info.power);
-  pwm->setPin(motor_info.pin2, 0);
+  // pwm->setPin(motor_info.pin1, motor_info.power);
+  // pwm->setPin(motor_info.pin2, 0);
   // delay(100);
   Serial.print(motor_info.power);
   Serial.print(" pin: ");
@@ -89,11 +83,13 @@ void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2, 
   và ngược lại
 */
 
-void safe_rotate(float *power_current, float *power_new, int pin1, int pin2, std::vector<Rotate>* list_rotate){ // power đi từ 1 đến -1. 0 là điểm trung gian
+void safe_rotate(int *power_current, int *power_new, int pin1, int pin2, std::vector<Rotate>* list_rotate){ // power đi từ 1 đến -1. 0 là điểm trung gian
 
   bool isInvert = false;
-  int value = abs(int(*power_current * max_power));
-  int value_new = abs(int(*power_new * max_power));
+  // int value = abs(int(*power_current * max_power));
+  // int value_new = abs(int(*power_new * max_power));
+  int value = *power_current;
+  int value_new = *power_new;
 
   if((*power_current) * (*power_new) < 0) isInvert = true;
 
@@ -340,7 +336,10 @@ void OVER_GEAR(){ // luôn đi đúng tốc độ
 }
 
 void move2(){
-   Serial.println(CURRENT_GEAR);
+  //  Serial.println(CURRENT_GEAR);
+   if(invert && CURRENT_GEAR > 0) CURRENT_GEAR *= -1;
+   left_pin = MOTOR_PIN[LEFT][MAX_GEAR + CURRENT_GEAR];
+   right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + CURRENT_GEAR];
    if(robot_status == 1){
       new_power_left += power_lift * y_axis;
       new_power_right += power_lift * y_axis;
@@ -381,6 +380,7 @@ void move2(){
         delay(200);
       }
    }
+   if(invert && CURRENT_GEAR < 0) CURRENT_GEAR *= -1;
 }
 
 
