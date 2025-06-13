@@ -52,6 +52,7 @@ bool gear_down = false;
 bool zero_force = false;
 bool is_reverse = false;
 bool invert = false; // reverse
+bool fast_stop = false;
 
 int CURRENT_GEAR = 0;
 int robot_status = 0;

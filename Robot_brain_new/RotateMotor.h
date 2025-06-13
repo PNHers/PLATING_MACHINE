@@ -316,6 +316,14 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 // }
 
 void FAST_MOTOR_STOP(){ // làm motor dừng đột ngột
+  if(!invert){    
+    left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
+    right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
+  }
+  else{
+    left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
+    right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+  }
   while(new_power_left != 0 || new_power_right != 0){
     if(new_power_left > 0) new_power_left -= power_lift;
     if(new_power_right > 0) new_power_right -= power_lift;
@@ -381,6 +389,10 @@ void move2(){
       }
    }
    if(invert && CURRENT_GEAR < 0) CURRENT_GEAR *= -1;
+}
+
+void self_rotate(){
+
 }
 
 

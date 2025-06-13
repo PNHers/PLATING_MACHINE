@@ -67,7 +67,9 @@ void loop() {
   // // delay(50);
   max_different_rotate = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] * (TURN_RATIO / 100.0); 
   
-  move2();
+  if (!fast_stop) move2();
+  if(CURRENT_GEAR == 0) self_rotate();
+  
   RotateInfo left_motor = {&current_power_left, &new_power_left, left_pin.pin1, left_pin.pin2};
   RotateInfo right_motor = {&current_power_right, &new_power_right, right_pin.pin1, right_pin.pin2};
 
@@ -79,7 +81,7 @@ void loop() {
   // Serial.print(current_power_left);
   // Serial.print(" ");
   // Serial.println(current_power_right);
-
+  if(fast_stop) fast_stop = false;
   unpress_button();
 
   // for(int i = 0; i < MAX_GEAR + MAX_GEAR; i++){

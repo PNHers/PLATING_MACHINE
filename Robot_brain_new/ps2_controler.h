@@ -163,10 +163,14 @@ void CONSOL_READ(){
   if(ps2x.Button(ZERO_FORCE) && !zero_force){
     CURRENT_GEAR = 0;
     FAST_MOTOR_STOP();
+    fast_stop = true;
     Serial.println(CURRENT_GEAR);
     zero_force = true;
   }
   if(ps2x.Button(REVERSE) && !is_reverse){
+    FAST_MOTOR_STOP();
+    fast_stop = true;
+    CURRENT_GEAR = 0;
     invert = true;
     Serial.println("reverse mode");
     is_reverse = true;
