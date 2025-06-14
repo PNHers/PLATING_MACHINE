@@ -1,5 +1,5 @@
 
-# Tổng hợp mã nguồn cho con robot trồng cây.
+# Tổng hợp mã nguồn cho con robot vận chuyển trong cuộc thi FPTU AI & ROBOTIC (2025).
 
 ## Rule
 - Không tự tiện sửa code của người khác
