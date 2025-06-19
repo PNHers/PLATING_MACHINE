@@ -3,6 +3,7 @@
 
 #include "SparkFunLSM6DSO.h"
 #include "Wire.h"
+#include "config_button.h"
 
 LSM6DSO myIMU; 
 
@@ -18,12 +19,23 @@ void gyro_setup(){
     Serial.println("Freezing");
   }
 
-  if( myIMU.initialize(BASIC_SETTINGS) )
-    Serial.println("Loaded Settings.");
+  if( myIMU.initialize(BASIC_SETTINGS) ) Serial.println("Loaded Settings.");
+
+  Serial.println("Please wait for gyro calibrate.....");
+  for(int i = 0; i < samples; i++){
+    A_OFFSET_X += myIMU.readFloatAccelX();
+    A_OFFSET_Y += myIMU.readFloatAccelY();
+    A_OFFSET_Z += myIMU.readFloatAccelZ();
+    delay(2);
+  }
+  A_OFFSET_X /= samples;
+  A_OFFSET_Y /= samples;
+  A_OFFSET_Z /= samples;
+  Serial.println("Calibrate done!");
 }
 
 void get_accel(){
-  // //Get all parameters
+  //Get all parameters
   // Serial.print("\nAccelerometer:\n");
   // Serial.print(" X = ");
   // Serial.println(myIMU.readFloatAccelX(), 3);
@@ -46,9 +58,9 @@ void get_accel(){
   
   // delay(200);
 
-  A_X = myIMU.readFloatAccelX();
-  A_Y = myIMU.readFloatAccelY();
-  A_Z = myIMU.readFloatAccelZ();
+  A_X = myIMU.readFloatAccelX() - A_OFFSET_X;
+  A_Y = myIMU.readFloatAccelY() - A_OFFSET_Y;
+  A_Z = myIMU.readFloatAccelZ() - A_OFFSET_Z;
 
   GYRO_X = myIMU.readFloatGyroX();
   GYRO_Y = myIMU.readFloatGyroY();

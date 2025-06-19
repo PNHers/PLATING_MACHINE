@@ -4,10 +4,13 @@
 #include "servo_controller.h"
 #include "config_button.h"
 #include "gyro_control.h"
+#include <SimpleKalmanFilter.h>
 
 // trạng thái
 
 #define time_to_pull 1
+
+SimpleKalmanFilter noise_filter(0.2, 0.01, 1);
 
 // Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
@@ -34,7 +37,7 @@ void setup() {
   Serial.println("Waiting for setup.....");
   delay(2000);
 
-  // gyro_setup();
+  gyro_setup();
   // setupPS2();
   // servo_setup();
   // Div_level();
@@ -81,10 +84,15 @@ void loop() {
   // if(fast_stop) fast_stop = false;
   // unpress_button();
   
-  // get_accel();
+  get_accel();
 
-  Serial.println(xPortGetCoreID());
+  // Serial.println(xPortGetCoreID());
+  float temp = noise_filter.updateEstimate(A_X);
+
+  Serial.print(A_X);
+  Serial.print(",");
+  Serial.println(temp);
 
 
-  delay(1000);
+  delay(200);
 }
