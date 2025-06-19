@@ -18,3 +18,4 @@
 - https://github.com/makerviet/Arduino-PS2X-ESP32-Makerbot (PS2)
 - https://github.com/cvmanjoo/RTC (time)
 - https://github.com/adafruit/Adafruit_BusIO (Adafruit BusIO)
+- https://github.com/sparkfun/SparkFun_Qwiic_6DoF_LSM6DSO_Arduino_Library ( 6DoF LSM6DSO )
