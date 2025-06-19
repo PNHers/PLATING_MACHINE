@@ -4,12 +4,14 @@
 #include <vector>
 
 // CONSOLE
+
 #define GEAR_UP PSB_L2
 #define GEAR_DOWN PSB_L1
 #define ZERO_FORCE PSB_L3
 #define REVERSE PSB_R3
 
 // MOTOR SETTING
+
 #define HOLD 0
 #define PULL 1
 #define BACK -1
@@ -33,6 +35,24 @@
 #define LEFT_PIN_2 9
 #define RIGHT_PIN_1 10 // đầu dương
 #define RIGHT_PIN_2 11
+
+// SERVO SETTING
+
+#define SERVO_1_CHANNEL 2
+#define SERVO_2_CHANNEL 3
+#define SERVO_3_CHANNEL 4
+#define SERVO_4_CHANNEL 5
+#define SERVO_5_CHANNEL 6
+#define SERVO_6_CHANNEL 7
+
+#define NOTIFY_LED 13
+
+
+/*/////////////////////////////////////////////////////
+ 
+    All below here are temp variable for processing
+ 
+*//////////////////////////////////////////////////////
 
 // STRUCT
 struct PIN{
