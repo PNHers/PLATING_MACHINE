@@ -34,13 +34,13 @@ void setup() {
   Serial.println("Waiting for setup.....");
   delay(2000);
 
-  gyro_setup();
+  // gyro_setup();
   // setupPS2();
-  servo_setup();
-  Div_level();
+  // servo_setup();
+  // Div_level();
 
   Serial.println("Setup done!");
-  setup_timer();
+  // setup_timer();
 
 }
 
@@ -81,7 +81,9 @@ void loop() {
   // if(fast_stop) fast_stop = false;
   // unpress_button();
   
-  get_accel();
+  // get_accel();
+
+  Serial.println(xPortGetCoreID());
 
 
   delay(1000);

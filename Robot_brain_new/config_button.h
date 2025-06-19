@@ -93,5 +93,9 @@ PIN left_pin, right_pin;
 std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(MAX_GEAR * 2 + 2, 0)); //lưu mức năng lượng
 std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(MAX_GEAR * 2 + 2, {0, 0})); //lưu chân pin
 
+// gyro data
+float A_X = 0, A_Y = 0, A_Z = 0;
+float GYRO_X = 0, GYRO_Y = 0, GYRO_Z = 0; 
+
 
 #endif
