@@ -26,12 +26,24 @@ void gyro_setup(){
     A_OFFSET_X += myIMU.readFloatAccelX();
     A_OFFSET_Y += myIMU.readFloatAccelY();
     A_OFFSET_Z += myIMU.readFloatAccelZ();
+    GYRO_OFFSET_X += myIMU.readFloatGyroX();
+    GYRO_OFFSET_Y += myIMU.readFloatGyroY();
+    GYRO_OFFSET_Z += myIMU.readFloatGyroZ();
     delay(2);
   }
   A_OFFSET_X /= samples;
   A_OFFSET_Y /= samples;
   A_OFFSET_Z /= samples;
+  GYRO_OFFSET_X /= samples;
+  GYRO_OFFSET_Y /= samples;
+  GYRO_OFFSET_Z /= samples;
   Serial.println("Calibrate done!");
+}
+
+void three_variables_stab(float* a, float* b, float* c){
+  *a = gyro_stab.updateEstimate(*a);
+  *b = gyro_stab.updateEstimate(*b);
+  *c = gyro_stab.updateEstimate(*c);
 }
 
 void get_accel(){
@@ -62,9 +74,15 @@ void get_accel(){
   A_Y = myIMU.readFloatAccelY() - A_OFFSET_Y;
   A_Z = myIMU.readFloatAccelZ() - A_OFFSET_Z;
 
-  GYRO_X = myIMU.readFloatGyroX();
-  GYRO_Y = myIMU.readFloatGyroY();
-  GYRO_Z = myIMU.readFloatGyroZ();
+  GYRO_X = myIMU.readFloatGyroX() - GYRO_OFFSET_X;
+  GYRO_Y = myIMU.readFloatGyroY() - GYRO_OFFSET_Y;
+  GYRO_Z = myIMU.readFloatGyroZ() - GYRO_OFFSET_Z;
+
+  three_variables_stab(&GYRO_X, &GYRO_Y, &GYRO_Z);
+}
+
+void get_range_gyro(){
+  Serial.println(myIMU.getGyroRange());
 }
 
 #endif

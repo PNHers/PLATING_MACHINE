@@ -2,6 +2,10 @@
 #define CONFIG_BUTTON_H
 
 #include <vector>
+#include <SimpleKalmanFilter.h>
+#include <Adafruit_PWMServoDriver.h>
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 // CONSOLE
 
@@ -46,6 +50,11 @@
 #define SERVO_6_CHANNEL 7
 
 #define NOTIFY_LED 13
+
+SimpleKalmanFilter gyro_stab(0.2, 0.1, 1);
+SimpleKalmanFilter joystick_stab(0.5, 0.01, 0.5);
+SimpleKalmanFilter motor_smooth(0.5, 0.01, 0.5);
+
 
 
 /*/////////////////////////////////////////////////////
@@ -97,6 +106,8 @@ std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(MAX_GEAR * 2 + 2, {0
 int samples = 1000;
 float A_OFFSET_X = 0, A_OFFSET_Y = 0, A_OFFSET_Z = 0;
 float A_X = 0, A_Y = 0, A_Z = 0;
+
+float GYRO_OFFSET_X = 0, GYRO_OFFSET_Y = 0, GYRO_OFFSET_Z = 0;
 float GYRO_X = 0, GYRO_Y = 0, GYRO_Z = 0; 
 
 

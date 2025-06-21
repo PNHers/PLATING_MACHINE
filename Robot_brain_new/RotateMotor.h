@@ -11,6 +11,8 @@
 #define max_power 2025
 #define STEP 100
 
+// Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+
 int MAX_LEVEL = MAX_GEAR + MAX_GEAR;
 bool already_pull = false, is_rotate = false;
 
@@ -190,7 +192,7 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 }
 
 
-void FAST_MOTOR_STOP(){ // làm motor dừng đột ngột
+void FAST_MOTOR_STOP(){ // làm motor dừng từ từ nhưng nhanh
   if(!invert){    
     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
     right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
@@ -207,7 +209,7 @@ void FAST_MOTOR_STOP(){ // làm motor dừng đột ngột
   }
 }
 
-void OVER_GEAR(){ // luôn đi đúng tốc độ
+void OVER_GEAR(){ // luôn đi đúng tốc độ // kiểu như là đang đi hết ga số 3 thì lùi về số 2 chắc chắn xe sẽ giảm tốc cho phù hợp với số 2
   if(new_power_left > POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] || new_power_right > POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]){
     new_power_left -= power_lift;
     new_power_right -= power_lift; 
@@ -323,6 +325,28 @@ void self_rotate(){
       rotate_left = false;
       rotate_right = false;
    }
+}
+
+void setPWMMotors2(int* power, PIN* pin){
+  if (*power < 0){return ;}
+  // pwm.setPin(pin->pin1, *power);
+  // pwm.setPin(pin->pin2, 0);
+  delay(50);
+  // Serial.print(*power);
+  // Serial.print(" pin: ");
+  // Serial.print(pin->pin1);
+  // Serial.print(" ");
+  // Serial.println(pin->pin2);
+}
+
+void smooth_motor(int* left_motor, int* right_motor){
+  int left_power = motor_smooth.updateEstimate(*left_motor);
+  int right_power = motor_smooth.updateEstimate(*right_motor);
+  Serial.print(left_power);
+  Serial.print(",");
+  Serial.println(right_power);
+  setPWMMotors2(&left_power, &left_pin);
+  setPWMMotors2(&right_power, &right_pin);
 }
 
 

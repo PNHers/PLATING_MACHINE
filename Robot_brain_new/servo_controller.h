@@ -5,7 +5,7 @@
 #include <Wire.h>
 #include "config_button.h"
 
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+// Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 void set_servo(uint8_t channel, uint16_t pulse) {
   pwm.setPWM(channel, 0, pulse);
