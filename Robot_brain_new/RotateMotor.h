@@ -349,8 +349,8 @@ void setPWMMotors2(int* power, PIN* pin){
 }
 
 void smooth_motor(int* left_motor, int* right_motor){
-  left_power = motor_smooth.updateEstimate(*left_motor);
-  right_power = motor_smooth.updateEstimate(*right_motor);
+  left_power = motor_left_smooth.updateEstimate(*left_motor);
+  right_power = motor_right_smooth.updateEstimate(*right_motor);
   Serial.print(left_power);
   Serial.print(",");
   Serial.println(right_power);

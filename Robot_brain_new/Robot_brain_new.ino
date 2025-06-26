@@ -39,6 +39,7 @@ void setup() {
   servo_setup();
   gyro_setup();
   check_min_power();
+  Serial.println("test");
   Div_level();
 
   setup_timer();
@@ -52,12 +53,21 @@ void setup() {
 void loop() {
 
   // // tick_timer();
+  get_accel();
   ps2x.read_gamepad();
   CONSOL_READ();
   position_of_console(&console_x_axis, &console_y_axis);
   check_status(console_y_axis);
 
   smooth_joystick();
+
+  // Serial.print(console_y_axis);
+  // Serial.print(",");
+  // Serial.print(console_x_axis);
+  // Serial.print(",");
+  // Serial.print(y_axis);
+  // Serial.print(",");
+  // Serial.println(x_axis);
 
   // // if(robot_status != 2) pull = false;
   // // // Serial.println(robot_status);
@@ -72,23 +82,16 @@ void loop() {
   // // // delay(50);
   max_different_rotate = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] * (TURN_RATIO / 100.0); 
   
-  // if(CURRENT_GEAR == 0) self_rotate();
-  // else if (!fast_stop && !rotate_left && !rotate_right) move2();
+  if(CURRENT_GEAR == 0) self_rotate();
+  else if (!fast_stop && !rotate_left && !rotate_right) move2();
 
   
   // RotateInfo left_motor = {&current_power_left, &new_power_left, left_pin.pin1, left_pin.pin2};
   // RotateInfo right_motor = {&current_power_right, &new_power_right, right_pin.pin1, right_pin.pin2};
 
   // rotate_2_motor(left_motor, right_motor, &pwm);
-  Serial.print(console_y_axis);
-  Serial.print(",");
-  Serial.print(console_x_axis);
-  Serial.print(",");
-  Serial.print(y_axis);
-  Serial.print(",");
-  Serial.println(x_axis);
-
-  // smooth_motor(&new_power_left, &new_power_right);
+ 
+  smooth_motor(&new_power_left, &new_power_right);
 
   current_power_left = new_power_left;
   current_power_right = new_power_right;
@@ -99,7 +102,7 @@ void loop() {
   if(fast_stop) fast_stop = false;
   unpress_button();
   
-  get_accel();
+
 
   // Serial.print(A_X);
   // Serial.print(",");
