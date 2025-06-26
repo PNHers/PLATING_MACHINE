@@ -1,3 +1,4 @@
+#include "esp32-hal.h"
 #ifndef GYRO_CONTROL_H
 #define GYRO_CONTROL_H
 
@@ -7,7 +8,7 @@
 
 LSM6DSO myIMU; 
 
-int data; 
+long data, OLD_TIME = 0, TIME = 0; 
 
 void gyro_setup(){
   Wire.begin();
@@ -20,7 +21,9 @@ void gyro_setup(){
   }
 
   if( myIMU.initialize(BASIC_SETTINGS) ) Serial.println("Loaded Settings.");
-
+  myIMU.setHighPerfGyro(true);
+  myIMU.setGyroDataRate(6660);
+  myIMU.setGyroRange(2000);
   Serial.println("Please wait for gyro calibrate.....");
   for(int i = 0; i < samples; i++){
     A_OFFSET_X += myIMU.readFloatAccelX();
@@ -29,7 +32,7 @@ void gyro_setup(){
     GYRO_OFFSET_X += myIMU.readFloatGyroX();
     GYRO_OFFSET_Y += myIMU.readFloatGyroY();
     GYRO_OFFSET_Z += myIMU.readFloatGyroZ();
-    delay(2);
+    delay(1);
   }
   A_OFFSET_X /= samples;
   A_OFFSET_Y /= samples;
@@ -38,12 +41,13 @@ void gyro_setup(){
   GYRO_OFFSET_Y /= samples;
   GYRO_OFFSET_Z /= samples;
   Serial.println("Calibrate done!");
+  OLD_TIME = millis();
 }
 
 void three_variables_stab(float* a, float* b, float* c){
-  *a = gyro_stab.updateEstimate(*a);
-  *b = gyro_stab.updateEstimate(*b);
-  *c = gyro_stab.updateEstimate(*c);
+  *a = gyro_x_stab.updateEstimate(*a);
+  *b = gyro_y_stab.updateEstimate(*b);
+  *c = gyro_z_stab.updateEstimate(*c);
 }
 
 void get_accel(){
@@ -77,12 +81,37 @@ void get_accel(){
   GYRO_X = myIMU.readFloatGyroX() - GYRO_OFFSET_X;
   GYRO_Y = myIMU.readFloatGyroY() - GYRO_OFFSET_Y;
   GYRO_Z = myIMU.readFloatGyroZ() - GYRO_OFFSET_Z;
-
-  three_variables_stab(&GYRO_X, &GYRO_Y, &GYRO_Z);
 }
 
 void get_range_gyro(){
   Serial.println(myIMU.getGyroRange());
+}
+
+void gyro_setup_tick(){
+  int TEMP = 0, DEM = 0;
+  int TIME = 0, TIME_NEW = 0;
+  TIME = rtc.getSeconds();
+  for(int i = 0; i < 5; i++){
+    while(TIME_NEW - TIME != 1){
+      TIME_NEW = rtc.getSeconds();
+      get_accel();
+      DEM += 1;
+    }
+    TEMP += DEM;
+    DEM = 0;
+    TIME = rtc.getSeconds();
+  }
+  gyro_tick = TEMP / 5.0;
+  gyro_tick = 1.0/gyro_tick;
+  Serial.println(gyro_tick, 10);
+  ROLL = PITCH = YAW = 0;
+}
+
+bool detect_movement(){
+  if(abs(A_X) > MOVE_POINT || abs(A_Y) > MOVE_POINT || abs(A_Z) > MOVE_POINT){
+    return true;
+  }
+  return false;
 }
 
 #endif

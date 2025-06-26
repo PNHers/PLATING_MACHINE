@@ -132,6 +132,12 @@ void position_of_console(float* x_axis, float* y_axis) {
   *y_axis = -handled_psy;
 }
 
+void smooth_joystick(){
+  x_axis = joystick_stab.updateEstimate(console_x_axis);
+  y_axis = joystick_stab.updateEstimate(console_y_axis);
+}
+
+
 void unpress_button(){
   if(!ps2x.Button(GEAR_UP) && gear_up){
     gear_up = false;

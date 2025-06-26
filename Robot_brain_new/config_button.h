@@ -51,9 +51,11 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 #define NOTIFY_LED 13
 
-SimpleKalmanFilter gyro_stab(0.2, 0.1, 1);
+SimpleKalmanFilter gyro_x_stab(10, 6, 1);
+SimpleKalmanFilter gyro_y_stab(10, 6, 1);
+SimpleKalmanFilter gyro_z_stab(10, 6, 1);
 SimpleKalmanFilter joystick_stab(0.5, 0.01, 0.5);
-SimpleKalmanFilter motor_smooth(0.5, 0.01, 0.5);
+SimpleKalmanFilter motor_smooth(100, 1, 1);
 
 
 
@@ -95,7 +97,12 @@ int new_power_left = 0, new_power_right = 0;
 
 int power_lift = 0;
 
+float gyro_tick = 1;
+float ROLL = 0, PITCH = 0, YAW = 0;
+
+float console_x_axis = 0, console_y_axis = 0;
 float x_axis = 0, y_axis = 0;
+int left_power = 0, right_power = 0;
 
 PIN left_pin, right_pin;
 
@@ -103,9 +110,10 @@ std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(MAX_GEAR * 2 + 2, 
 std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(MAX_GEAR * 2 + 2, {0, 0})); //lưu chân pin
 
 // gyro data
-int samples = 1000;
+int samples = 2000;
 float A_OFFSET_X = 0, A_OFFSET_Y = 0, A_OFFSET_Z = 0;
 float A_X = 0, A_Y = 0, A_Z = 0;
+float MOVE_POINT = 0.3;
 
 float GYRO_OFFSET_X = 0, GYRO_OFFSET_Y = 0, GYRO_OFFSET_Z = 0;
 float GYRO_X = 0, GYRO_Y = 0, GYRO_Z = 0; 

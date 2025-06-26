@@ -31,12 +31,15 @@ void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn gi�
 
 void Div_level(){ // lưu các giá trị vào ma trận
   int temp = (MAX_POWER - MIN_POWER) / MAX_GEAR;
+  POWER_LEVEL[LEFT][MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR] = MIN_POWER;
+
   for(int i = 1; i <= MAX_GEAR; i++){
     POWER_LEVEL[LEFT][i + MAX_GEAR] = POWER_LEVEL[LEFT][i + MAX_GEAR - 1] + temp;
     POWER_LEVEL[RIGHT][i + MAX_GEAR] = POWER_LEVEL[RIGHT][i + MAX_GEAR - 1] + temp;
     MOTOR_PIN[LEFT][i + MAX_GEAR] = {LEFT_PIN_1, LEFT_PIN_2};
     MOTOR_PIN[RIGHT][i + MAX_GEAR] = {RIGHT_PIN_1, RIGHT_PIN_2};
   }
+
   int k = MAX_GEAR + MAX_GEAR;
   for(int i = 0; i < MAX_GEAR; i++){
     POWER_LEVEL[LEFT][i] = POWER_LEVEL[LEFT][k];
@@ -45,8 +48,11 @@ void Div_level(){ // lưu các giá trị vào ma trận
     MOTOR_PIN[LEFT][i] = {LEFT_PIN_2, LEFT_PIN_1};
     MOTOR_PIN[RIGHT][i] = {RIGHT_PIN_2, RIGHT_PIN_1};
   }
+  
   POWER_LEVEL[LEFT][0] = POWER_LEVEL[RIGHT][0] = MAX_POWER;
   POWER_LEVEL[LEFT][MAX_GEAR + MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR + MAX_GEAR] = MAX_POWER;
+  POWER_LEVEL[LEFT][MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR] = 0;
+  
   power_lift = temp / 2;
   self_rotate_gap = (MAX_POWER - MIN_POWER) * (SELF_ROTATE_RATIO / 100.0);
 }
@@ -325,6 +331,8 @@ void self_rotate(){
       rotate_left = false;
       rotate_right = false;
    }
+
+
 }
 
 void setPWMMotors2(int* power, PIN* pin){
@@ -340,8 +348,8 @@ void setPWMMotors2(int* power, PIN* pin){
 }
 
 void smooth_motor(int* left_motor, int* right_motor){
-  int left_power = motor_smooth.updateEstimate(*left_motor);
-  int right_power = motor_smooth.updateEstimate(*right_motor);
+  left_power = motor_smooth.updateEstimate(*left_motor);
+  right_power = motor_smooth.updateEstimate(*right_motor);
   Serial.print(left_power);
   Serial.print(",");
   Serial.println(right_power);
