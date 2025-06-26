@@ -35,10 +35,11 @@ void setup() {
   Serial.println("Waiting for setup.....");
   delay(2000);
 
-  gyro_setup();
   setupPS2();
-  // servo_setup();
-  // Div_level();
+  servo_setup();
+  gyro_setup();
+  check_min_power();
+  Div_level();
 
   setup_timer();
   // // gyro_setup_tick();

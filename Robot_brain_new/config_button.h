@@ -22,7 +22,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 #define IDLE 0.1 // stand
 
-#define MIN_POWER 512
+int MIN_POWER = 0;
 #define MAX_POWER 2048
 #define MAX_GEAR 4
 #define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn MAX_GEAR 
@@ -98,6 +98,8 @@ int new_power_left = 0, new_power_right = 0;
 
 int power_lift = 0;
 
+std::vector<int> MIN_VALUE = {128, 256, 512, 1024};
+
 float gyro_tick = 1;
 float ROLL = 0, PITCH = 0, YAW = 0;
 
@@ -109,6 +111,7 @@ PIN left_pin, right_pin;
 
 std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(MAX_GEAR * 2 + 2, 0)); //lưu mức năng lượng
 std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(MAX_GEAR * 2 + 2, {0, 0})); //lưu chân pin
+
 
 // gyro data
 int samples = 2000;

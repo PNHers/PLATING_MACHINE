@@ -6,6 +6,7 @@
 #include <Adafruit_PWMServoDriver.h>
 #include "config_button.h"
 #include <vector>
+#include "gyro_control.h"
 
 #define MENSURE_VAULE 0.05 // sai số khi joystick để ở vị trí ban đầu
 #define max_power 2025
@@ -355,6 +356,26 @@ void smooth_motor(int* left_motor, int* right_motor){
   Serial.println(right_power);
   setPWMMotors2(&left_power, &left_pin);
   setPWMMotors2(&right_power, &right_pin);
+}
+
+void check_min_power(){
+  Serial.println("checking min power");
+  delay(1000);
+  for(int i = 0; i < MIN_VALUE.size(); i++){
+    Serial.print("Testing ");
+    Serial.println(MIN_VALUE[i]);
+    delay(500);
+    // chay motor
+    if(detect_movement()){
+      MIN_POWER = MIN_VALUE[i];
+      //dung motor
+      break;
+    }
+    else {
+      // dung motor
+    }
+    delay(1000);
+  }
 }
 
 
