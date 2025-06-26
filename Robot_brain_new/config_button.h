@@ -54,7 +54,8 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 SimpleKalmanFilter gyro_x_stab(10, 6, 1);
 SimpleKalmanFilter gyro_y_stab(10, 6, 1);
 SimpleKalmanFilter gyro_z_stab(10, 6, 1);
-SimpleKalmanFilter joystick_stab(0.5, 0.01, 0.5);
+SimpleKalmanFilter joystick_y_stab(0.5, 0.01, 0.8);
+SimpleKalmanFilter joystick_x_stab(0.5, 0.01, 0.8);
 SimpleKalmanFilter motor_smooth(100, 1, 1);
 
 

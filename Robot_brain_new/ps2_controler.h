@@ -133,8 +133,8 @@ void position_of_console(float* x_axis, float* y_axis) {
 }
 
 void smooth_joystick(){
-  x_axis = joystick_stab.updateEstimate(console_x_axis);
-  y_axis = joystick_stab.updateEstimate(console_y_axis);
+  x_axis = joystick_x_stab.updateEstimate(console_x_axis);
+  y_axis = joystick_y_stab.updateEstimate(console_y_axis);
 }
 
 
