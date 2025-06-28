@@ -25,15 +25,15 @@ void check_status(float y_axis){
 
 
 void setup() {
-  pwm.begin();
-  pwm.setOscillatorFrequency(27000000); 
-  pwm.setPWMFreq(50);
-  Wire.setClock(400000); 
-
   Serial.begin(115200);
   delay(100);
   Serial.println("Waiting for setup.....");
   delay(2000);
+  
+  pwm.begin();
+  pwm.setOscillatorFrequency(27000000); 
+  pwm.setPWMFreq(50);
+  Wire.setClock(400000); 
 
   setupPS2();
   servo_setup();
@@ -85,6 +85,9 @@ void loop() {
   if(CURRENT_GEAR == 0) self_rotate();
   else if (!fast_stop && !rotate_left && !rotate_right) move2();
 
+  if (new_power_left < 0) new_power_left = 0;
+  if (new_power_right < 0) new_power_right = 0;
+
   
   // RotateInfo left_motor = {&current_power_left, &new_power_left, left_pin.pin1, left_pin.pin2};
   // RotateInfo right_motor = {&current_power_right, &new_power_right, right_pin.pin1, right_pin.pin2};
@@ -125,6 +128,6 @@ void loop() {
 
   // if(detect_movement()) Serial.println("Object is moving!");
 
-  delay(5);
+  // delay(5);
   
 }

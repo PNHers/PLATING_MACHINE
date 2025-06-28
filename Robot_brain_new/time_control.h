@@ -11,11 +11,12 @@ int new_time = 0, base_time = 0;
 
 int TIME_SECS = 0;
 
+// setupClock
 void setup_timer(){
-  if(!rtc.begin()){
+  if (!rtc.begin()){
     Serial.println("Module thoi gian khong duoc ket noi");
     Serial.flush();
-    while(1);
+    return;
   }
   rtc.setTime(0, 0, 0);
   rtc.setDate(11, 9, 2001); // đừng hỏi vì sao :)
