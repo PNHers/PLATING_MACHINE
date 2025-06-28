@@ -27,6 +27,20 @@ void swap(int& a, int& b){ // ý là cái hàm này không xài nhưng vẫn gi�
   b = temp;
 }
 
+void setServo180(Adafruit_PWMServoDriver* pwm, uint8_t channel, int rotate_angle) {
+  //float handled_angle = (rotate_angle - MIN_ANGLE_DEFAULT)/ (MAX_ANGLE_DEFAULT - MIN_ANGLE_DEFAULT);
+  uint16_t pulse = (MAX_ROTATE - MIN_ROTATE)* rotate_angle/180 + MIN_ROTATE;
+  pwm->setPWM(channel, 0, pulse);
+  Serial.print("rotate collector arm at: ");
+  Serial.println(pulse);
+}
+
+void setServo360(Adafruit_PWMServoDriver* pwm, uint8_t channel, int rotate) { 
+  pwm->setPWM(channel, 0, rotate);
+  Serial.print("rotate collector at: ");
+  Serial.println(rotate);
+}
+
 void Div_level(){ // lưu các giá trị vào ma trận
   int temp = (MAX_POWER - MIN_POWER) / MAX_GEAR;
   for(int i = 1; i <= MAX_GEAR; i++){

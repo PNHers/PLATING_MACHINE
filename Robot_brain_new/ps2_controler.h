@@ -17,6 +17,7 @@
 #define ZERO_FORCE PSB_L3
 
 const float sai_so = 0.01; // sai số
+int collector_rotation_angle = DEFAULT_ANGLE;
 
 PS2X ps2x; // khởi tạo class PS2x
 
@@ -130,6 +131,29 @@ void position_of_console(float* x_axis, float* y_axis) {
   // rotate(handled_psx, -handled_psy, x_axis, y_axis);
   *x_axis = handled_psx;
   *y_axis = -handled_psy;
+}
+
+void control_collector(Adafruit_PWMServoDriver* pwm){
+  if (ps2x.Button(PSB_GREEN)){
+    collector_rotation_angle += 1;
+  }
+  else if (ps2x.Button(PSB_BLUE)){
+    collector_rotation_angle -= 1;
+  }
+  if (collector_rotation_angle > 180) {collector_rotation_angle = 180;}
+  else if (collector_rotation_angle < 0) {collector_rotation_angle = 0;}
+
+  setServo180(pwm, COLLECTOR_ROTATION_PIN, collector_rotation_angle);
+
+  int collector_angle = 0;
+  if (ps2x.Button(PSB_RED)){
+    collector_angle = 100;
+  }
+  else if (ps2x.Button(PSB_PINK)){
+    collector_angle = 500;
+  }
+  setServo360(pwm, COLLECTOR_PIN, collector_angle);
+
 }
 
 void unpress_button(){

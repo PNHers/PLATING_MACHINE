@@ -34,6 +34,15 @@
 #define RIGHT_PIN_1 10 // đầu dương
 #define RIGHT_PIN_2 11
 
+#define MIN_ROTATE 80
+#define MAX_ROTATE 570
+
+#define DEFAULT_ANGLE 90
+#define MIN_ANGLE_DEFAULT 0
+#define MAX_ANGLE_DEFAULT 180
+#define COLLECTOR_PIN 3
+#define COLLECTOR_ROTATION_PIN 2
+
 // STRUCT
 struct PIN{
   int pin1;
