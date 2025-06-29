@@ -1,9 +1,8 @@
 #include "time_control.h"
 #include "RotateMotor.h"
 #include "ps2_controler.h"
-#include "servo_controller.h"
-#include "config_button.h"
 #include "gyro_control.h"
+#include "config_button.h"
 #include <SimpleKalmanFilter.h>
 
 // Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
@@ -27,7 +26,7 @@ void checkStatus(float y_axis) {
 void setup() {
     Serial.begin(115200);
     delay(100);
-    Serial.println("Waiting for setup.....");
+    Serial.println("Initializing systems...");
     delay(2000);
 
     pwm.begin();
@@ -36,9 +35,8 @@ void setup() {
     Wire.setClock(400000);
 
     initPS2();
-    initServo();
-    //initGyro();
-    //check_min_power();
+    // initGyro();
+    // check_min_power();
     Serial.println("test");
     Div_level();
 
@@ -46,7 +44,7 @@ void setup() {
     // // gyro_setup_tick();
     // gyro_tick = 1.0 / myIMU.getGyroDataRate();
     // Serial.println(myIMU.getGyroDataRate());
-    Serial.println("Setup done!");
+    Serial.println("Initialation success!");
 }
 
 void loop() {
@@ -55,13 +53,13 @@ void loop() {
     // get_accel();
     ps2x.read_gamepad();
 
-    control_collector(&pwm);
+    controlCollector(&pwm);
 
     // consoleRead();
     // positionOfJoystick(console_x_axis, console_y_axis);
     // checkStatus(console_y_axis);
 
-    // smooth_joystick();
+    // smoothenJoystick();
 
     // // Serial.print(console_y_axis);
     // // Serial.print(",");
@@ -91,9 +89,9 @@ void loop() {
     // current_power_left = new_power_left;
     // current_power_right = new_power_right;
 
-    // // // Serial.print(current_power_left);
-    // // // Serial.print(" ");
-    // // // Serial.println(current_power_right);
+    // // Serial.print(current_power_left);
+    // // Serial.print(" ");
+    // // Serial.println(current_power_right);
     // if (fast_stop) fast_stop = false;
     // resetMotionState();
 

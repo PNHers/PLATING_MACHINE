@@ -4,11 +4,33 @@
 #include "esp32-hal.h"
 #include "SparkFunLSM6DSO.h"
 #include "Wire.h"
-#include "config_button.h"
+
+const int SAMPLES = 2000;
+const float MIN_ACCEL = 0.3;
+
+/*
+* Gyroscope axes:
+* X: Roll
+* Y: Pitch
+* Z: Yaw
+*/
+namespace GyroSettings {
+    SimpleKalmanFilter gyro_x_filter(10, 6, 1);
+    SimpleKalmanFilter gyro_y_filter(10, 6, 1);
+    SimpleKalmanFilter gyro_z_filter(10, 6, 1);
+
+    float gyro_tick = 1.0f;
+    float accel_x = 0, accel_y = 0, accel_z = 0;
+    float gyro_x = 0, gyro_y = 0, gyro_z = 0;
+    
+    float gyro_offset_x = 0, gyro_offset_y = 0, gyro_offset_z = 0;
+    float accel_offset_x = 0, accel_offset_y = 0, accel_offset_z = 0;
+    
+    // in degrees
+    float roll = 0, pitch = 0, yaw = 0;
+}
 
 LSM6DSO myIMU;
-
-long data, OLD_TIME = 0, TIME = 0;
 
 void initGyro() {
     using namespace GyroSettings;
@@ -33,30 +55,23 @@ void initGyro() {
 
     Serial.println("Calibrating gyroscope...");
 
-    for (int i = 0; i < samples; i++){
-        A_OFFSET_X += myIMU.readFloatAccelX();
-        A_OFFSET_Y += myIMU.readFloatAccelY();
-        A_OFFSET_Z += myIMU.readFloatAccelZ();
-        GYRO_OFFSET_X += myIMU.readFloatGyroX();
-        GYRO_OFFSET_Y += myIMU.readFloatGyroY();
-        GYRO_OFFSET_Z += myIMU.readFloatGyroZ();
+    for (int i = 0; i < SAMPLES; i++){
+        accel_offset_x += myIMU.readFloatAccelX();
+        accel_offset_y += myIMU.readFloatAccelY();
+        accel_offset_z += myIMU.readFloatAccelZ();
+        gyro_offset_x += myIMU.readFloatGyroX();
+        gyro_offset_y += myIMU.readFloatGyroY();
+        gyro_offset_z += myIMU.readFloatGyroZ();
         delay(1);
     }
 
-    A_OFFSET_X /= samples;
-    A_OFFSET_Y /= samples;
-    A_OFFSET_Z /= samples;
-    GYRO_OFFSET_X /= samples;
-    GYRO_OFFSET_Y /= samples;
-    GYRO_OFFSET_Z /= samples;
+    accel_offset_x /= SAMPLES;
+    accel_offset_y /= SAMPLES;
+    accel_offset_z /= SAMPLES;
+    gyro_offset_x /= SAMPLES;
+    gyro_offset_y /= SAMPLES;
+    gyro_offset_z /= SAMPLES;
     Serial.println("Calibration done!");
-    OLD_TIME = millis();
-}
-
-void three_variables_stab(float *a, float *b, float *c) {
-    *a = gyro_x_stab.updateEstimate(*a);
-    *b = gyro_y_stab.updateEstimate(*b);
-    *c = gyro_z_stab.updateEstimate(*c);
 }
 
 void get_accel() {
@@ -84,40 +99,18 @@ void get_accel() {
 
     // delay(200);
 
-    A_X = myIMU.readFloatAccelX() - A_OFFSET_X;
-    A_Y = myIMU.readFloatAccelY() - A_OFFSET_Y;
-    A_Z = myIMU.readFloatAccelZ() - A_OFFSET_Z;
+    accel_x = myIMU.readFloatAccelX() - accel_offset_x;
+    accel_y = myIMU.readFloatAccelY() - accel_offset_y;
+    accel_z = myIMU.readFloatAccelZ() - accel_offset_z;
 
-    GYRO_X = myIMU.readFloatGyroX() - GYRO_OFFSET_X;
-    GYRO_Y = myIMU.readFloatGyroY() - GYRO_OFFSET_Y;
-    GYRO_Z = myIMU.readFloatGyroZ() - GYRO_OFFSET_Z;
+    gyro_x = myIMU.readFloatGyroX() - gyro_offset_x;
+    gyro_y = myIMU.readFloatGyroY() - gyro_offset_y;
+    gyro_z = myIMU.readFloatGyroZ() - gyro_offset_z;
 }
 
-void gyro_setup_tick() {
-    int TEMP = 0, DEM = 0;
-    int TIME = 0, TIME_NEW = 0;
-    TIME = rtc.getSeconds();
-    for (int i = 0; i < 5; i++)
-    {
-        while (TIME_NEW - TIME != 1)
-        {
-            TIME_NEW = rtc.getSeconds();
-            get_accel();
-            DEM += 1;
-        }
-        TEMP += DEM;
-        DEM = 0;
-        TIME = rtc.getSeconds();
-    }
-    gyro_tick = TEMP / 5.0;
-    gyro_tick = 1.0 / gyro_tick;
-    Serial.println(gyro_tick, 10);
-    ROLL = PITCH = YAW = 0;
-}
-
-bool detect_movement() {
+bool isRobotMoving() {
     using namespace GyroSettings;
-    return (abs(A_X) > MOVE_POINT || abs(A_Y) > MOVE_POINT || abs(A_Z) > MOVE_POINT);
+    return (abs(accel_x) > MIN_ACCEL || abs(accel_y) > MIN_ACCEL || abs(accel_z) > MIN_ACCEL);
 }
 
 #endif

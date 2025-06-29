@@ -2,10 +2,11 @@
 #define ROTATEMOTOR_H
 
 #include <stdio.h>
+#include <vector>
+
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include "config_button.h"
-#include <vector>
 #include "gyro_control.h"
 
 #define MENSURE_VAULE 0.05 // sai số khi joystick để ở vị trí ban đầu
@@ -24,14 +25,16 @@ struct Rotate {
 };
 
 // ý là cái hàm này không xài nhưng vẫn giữ lại đây =))
-void swap(int &a, int &b) { 
+void swap(int &a, int &b)
+{
     int temp = a;
     a = b;
     b = temp;
 }
 
 // lưu các giá trị vào ma trận
-void Div_level() {
+void Div_level()
+{
     int temp = (MAX_POWER - MIN_POWER) / MAX_GEAR;
     POWER_LEVEL[LEFT][MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR] = MIN_POWER;
 
@@ -62,8 +65,10 @@ void Div_level() {
 }
 
 // anh dung dep trai
-void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver *pwm) {
-    if (motor_info.power < 0) return;
+void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver *pwm)
+{
+    if (motor_info.power < 0)
+        return;
 
     pwm->setPin(motor_info.pin1, motor_info.power);
     pwm->setPin(motor_info.pin2, 0);
@@ -75,18 +80,24 @@ void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver *pwm) {
     Serial.println(motor_info.pin2);
 }
 
-void setServo180(Adafruit_PWMServoDriver* pwm, uint8_t channel, int rotate_angle) {
-  //float handled_angle = (rotate_angle - MIN_ANGLE_DEFAULT)/ (MAX_ANGLE_DEFAULT - MIN_ANGLE_DEFAULT);
-  uint16_t pulse = (MAX_ROTATE - MIN_ROTATE)* rotate_angle/180 + MIN_ROTATE;
-  pwm->setPWM(channel, 0, pulse);
-  Serial.print("rotate collector arm at: ");
-  Serial.println(pulse);
+void setServo180(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate_angle)
+{
+    // float handled_angle = (rotate_angle - MIN_ANGLE_DEFAULT)/ (MAX_ANGLE_DEFAULT - MIN_ANGLE_DEFAULT);
+    uint16_t pulse = (MAX_ROTATE - MIN_ROTATE) * rotate_angle / 180 + MIN_ROTATE;
+    pwm->setPWM(channel, 0, 0);
+    pwm->setPWM(channel, 0, pulse);
+    Serial.print("rotate collector arm at: ");
+    Serial.println(pulse);
+    pwm->setPWM(channel, 0, 0);
 }
 
-void setServo360(Adafruit_PWMServoDriver* pwm, uint8_t channel, int rotate) { 
-  pwm->setPWM(channel, 0, rotate);
-  Serial.print("rotate collector at: ");
-  Serial.println(rotate);
+void setServo360(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate)
+{
+    pwm->setPWM(channel, 0, 0);
+    pwm->setPWM(channel, 0, rotate);
+    Serial.print("rotate collector at: ");
+    Serial.println(rotate);
+    pwm->setPWM(channel, 0, 0);
 }
 
 void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2, std::vector<Rotate> *list_rotate) {
@@ -112,7 +123,8 @@ void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2, 
 */
 
 // power đi từ 1 đến -1. 0 là điểm trung gian
-void safe_rotate(int *power_current, int *power_new, int pin1, int pin2, std::vector<Rotate> *list_rotate) { 
+void safe_rotate(int *power_current, int *power_new, int pin1, int pin2, std::vector<Rotate> *list_rotate)
+{
     bool isInvert = false;
     // int value = abs(int(*power_current * max_power));
     // int value_new = abs(int(*power_new * max_power));
@@ -122,32 +134,50 @@ void safe_rotate(int *power_current, int *power_new, int pin1, int pin2, std::ve
     if ((*power_current) * (*power_new) < 0)
         isInvert = true;
 
-    if (*power_new <= MENSURE_VAULE && *power_new >= -MENSURE_VAULE) {
+    if (*power_new <= MENSURE_VAULE && *power_new >= -MENSURE_VAULE)
+    {
         // sức mạnh của motor bằng 0 khi giá trị *power_new nằm trong vùng sai số;
-        if (*power_current > 0) {
+        if (*power_current > 0)
+        {
             smooth_increase_decrease(value, 0, STEP, pin1, pin2, list_rotate);
-        } else if (*power_current < 0) {
+        }
+        else if (*power_current < 0)
+        {
             smooth_increase_decrease(value, 0, STEP, pin2, pin1, list_rotate);
         }
         *power_new = 0;
     } // nothing
-    else if (isInvert) {
-        if (*power_current > 0) {
+    else if (isInvert)
+    {
+        if (*power_current > 0)
+        {
             smooth_increase_decrease(value, 0, STEP, pin1, pin2, list_rotate);
             smooth_increase_decrease(0, value_new, STEP, pin2, pin1, list_rotate);
-        } else if (*power_current < 0) {
+        }
+        else if (*power_current < 0)
+        {
             smooth_increase_decrease(value, 0, STEP, pin2, pin1, list_rotate);
             smooth_increase_decrease(0, value_new, STEP, pin1, pin2, list_rotate);
         }
-    } else {
-        if (*power_current > 0) {
+    }
+    else
+    {
+        if (*power_current > 0)
+        {
             smooth_increase_decrease(value, value_new, STEP, pin1, pin2, list_rotate);
-        } else if (*power_current < 0) {
+        }
+        else if (*power_current < 0)
+        {
             smooth_increase_decrease(value, value_new, STEP, pin2, pin1, list_rotate);
-        } else {
-            if (*power_new > 0) {
+        }
+        else
+        {
+            if (*power_new > 0)
+            {
                 smooth_increase_decrease(value, value_new, STEP, pin1, pin2, list_rotate);
-            } else if (*power_new < 0) {
+            }
+            else if (*power_new < 0)
+            {
                 smooth_increase_decrease(value, value_new, STEP, pin2, pin1, list_rotate);
             }
         }
@@ -158,9 +188,11 @@ bool Check_number(Rotate new_rotate, Rotate present_rotate) {
     return !(new_rotate.pin1 != present_rotate.pin1 && new_rotate.power * present_rotate.power != 0);
 }
 
-void smooth_rotate(std::vector<Rotate> RotateMotorbigger, std::vector<Rotate> RotateMotorsmaller, Adafruit_PWMServoDriver *pwm) {
+void smoothenRotate(std::vector<Rotate> RotateMotorbigger, std::vector<Rotate> RotateMotorsmaller, Adafruit_PWMServoDriver *pwm)
+{
     int jump_nb = RotateMotorbigger.size();
-    if (RotateMotorsmaller.size() > 0) {
+    if (RotateMotorsmaller.size() > 0)
+    {
         jump_nb = int(RotateMotorbigger.size() / RotateMotorsmaller.size());
     }
 
@@ -171,17 +203,23 @@ void smooth_rotate(std::vector<Rotate> RotateMotorbigger, std::vector<Rotate> Ro
     // Serial.println(RotateMotorbigger.size());
     // Serial.print("Smaller size:");
     // Serial.println(RotateMotorsmaller.size());
-    for (int k = 0; k < (RotateMotorbigger.size() + RotateMotorsmaller.size()); k++) {
-        if (cout == jump_nb && SmallMotorCout < RotateMotorsmaller.size()) {
-            if (SmallMotorCout == 0 || (Check_number(RotateMotorsmaller[SmallMotorCout], RotateMotorsmaller[SmallMotorCout - 1]))) {
+    for (int k = 0; k < (RotateMotorbigger.size() + RotateMotorsmaller.size()); k++)
+    {
+        if (cout == jump_nb && SmallMotorCout < RotateMotorsmaller.size())
+        {
+            if (SmallMotorCout == 0 || (Check_number(RotateMotorsmaller[SmallMotorCout], RotateMotorsmaller[SmallMotorCout - 1])))
+            {
                 setPWMMotors(RotateMotorsmaller[SmallMotorCout], pwm);
             }
             // Serial.print("Small: ");
             // Serial.println(SmallMotorCout);
             SmallMotorCout++;
             cout = 0;
-        } else {
-            if (SmallMotorCout == 0 || (Check_number(RotateMotorsmaller[SmallMotorCout], RotateMotorsmaller[SmallMotorCout - 1]))) {
+        }
+        else
+        {
+            if (SmallMotorCout == 0 || (Check_number(RotateMotorsmaller[SmallMotorCout], RotateMotorsmaller[SmallMotorCout - 1])))
+            {
                 setPWMMotors(RotateMotorbigger[BigMotorCout], pwm);
             }
             // Serial.print("Big: ");
@@ -192,28 +230,32 @@ void smooth_rotate(std::vector<Rotate> RotateMotorbigger, std::vector<Rotate> Ro
     }
 }
 
-void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDriver *pwm) {
+void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDriver *pwm)
+{
     std::vector<Rotate> RotateMotor1, RotateMotor2;
     safe_rotate(motor1.start, motor1.end, motor1.pin1, motor1.pin2, &RotateMotor1);
     safe_rotate(motor2.start, motor2.end, motor2.pin1, motor2.pin2, &RotateMotor2);
 
     for (auto const &motor : RotateMotor1) {
-        if (motor.power > 4096) {
+        if (motor.power > 4096)
+        {
             Serial.println("error");
         }
     }
 
     for (auto const &motor : RotateMotor2) {
-        if (motor.power > 4096) {
+        if (motor.power > 4096)
+        {
             Serial.println("error");
         }
     }
 
     if (RotateMotor1.size() > RotateMotor2.size()) {
-        smooth_rotate(RotateMotor1, RotateMotor2, pwm);
+        smoothenRotate(RotateMotor1, RotateMotor2, pwm);
         return;
     }
-    smooth_rotate(RotateMotor2, RotateMotor1, pwm);
+
+    smoothenRotate(RotateMotor2, RotateMotor1, pwm);
 
     // Serial.println(RotateMotor1.size());
     // for (auto motor : RotateMotor1){
@@ -226,48 +268,65 @@ void rotate_2_motor(RotateInfo motor1, RotateInfo motor2, Adafruit_PWMServoDrive
 }
 
 // làm motor dừng từ từ nhưng nhanh
-void FAST_MOTOR_STOP() {
-    if (!ControlState::invert) {
+void FAST_MOTOR_STOP()
+{
+    if (!ControlState::invert)
+    {
         left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
         right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
-    } else {
+    }
+    else
+    {
         left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
         right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
     }
 
-    while (new_power_left != 0 || new_power_right != 0) {
-        if (new_power_left > 0) {
+    while (new_power_left != 0 || new_power_right != 0)
+    {
+        if (new_power_left > 0)
+        {
             new_power_left -= power_lift;
-        } if (new_power_right > 0) {
+        }
+        if (new_power_right > 0)
+        {
             new_power_right -= power_lift;
-        } if (new_power_left < 0) {
+        }
+        if (new_power_left < 0)
+        {
             new_power_left = 0;
-        } if (new_power_right < 0) {
+        }
+        if (new_power_right < 0)
+        {
             new_power_right = 0;
         }
     }
 }
 
 // luôn đi đúng tốc độ // kiểu như là đang đi hết ga số 3 thì lùi về số 2 chắc chắn xe sẽ giảm tốc cho phù hợp với số 2
-void OVER_GEAR() {
+void OVER_GEAR()
+{
     if (!(new_power_left > POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] ||
-        new_power_right > POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR])) return;
+          new_power_right > POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]))
+        return;
 
     new_power_left -= power_lift;
     new_power_right -= power_lift;
 
-    if (new_power_left < POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR]) {
+    if (new_power_left < POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR])
+    {
         new_power_left = POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR];
     }
 
-    if (new_power_right < POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]) {
+    if (new_power_right < POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR])
+    {
         new_power_right = POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR];
     }
 
     delay(100);
 }
 
-void move2() {
+void move2()
+{
     //  Serial.println(CURRENT_GEAR);
     if (ControlState::invert && CURRENT_GEAR > 0)
         CURRENT_GEAR *= -1;
@@ -298,7 +357,8 @@ void move2() {
 
     OVER_GEAR();
 
-    if (abs(x_axis) > when_to_rotate) {
+    if (abs(x_axis) > when_to_rotate)
+    {
         if (x_axis > 0)
         {
             new_power_right -= power_lift * x_axis;
@@ -316,7 +376,9 @@ void move2() {
                 new_power_left = 0;
         }
         delay(50);
-    } else {
+    }
+    else
+    {
         if (new_power_left > new_power_right)
         {
             new_power_right += power_lift;
@@ -337,7 +399,8 @@ void move2() {
         CURRENT_GEAR *= -1;
 }
 
-void self_rotate() {
+void self_rotate()
+{
     using namespace ControlState;
     OVER_GEAR();
     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
@@ -419,8 +482,10 @@ void self_rotate() {
     }
 }
 
-void setPWMMotors2(int *power, PIN *pin) {
-    if (*power < 0) return;
+void setPWMMotors2(int *power, PIN *pin)
+{
+    if (*power < 0)
+        return;
     // pwm.setPin(pin->pin1, *power);
     // pwm.setPin(pin->pin2, 0);
     delay(50);
@@ -431,7 +496,8 @@ void setPWMMotors2(int *power, PIN *pin) {
     // Serial.println(pin->pin2);
 }
 
-void smooth_motor(int *left_motor, int *right_motor) {
+void smooth_motor(int *left_motor, int *right_motor)
+{
     left_power = motor_left_smooth.updateEstimate(*left_motor);
     right_power = motor_right_smooth.updateEstimate(*right_motor);
     Serial.print(left_power);
@@ -441,7 +507,8 @@ void smooth_motor(int *left_motor, int *right_motor) {
     setPWMMotors2(&right_power, &right_pin);
 }
 
-void check_min_power() {
+void check_min_power()
+{
     Serial.println("checking min power");
     delay(1000);
 
@@ -452,11 +519,14 @@ void check_min_power() {
         delay(500);
 
         // chay motor
-        if (detect_movement()) {
+        if (isRobotMoving())
+        {
             MIN_POWER = min_value;
             // dung motor
             break;
-        } else {
+        }
+        else
+        {
             // dung motor
         }
 

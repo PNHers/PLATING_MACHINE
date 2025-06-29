@@ -7,9 +7,7 @@
 
 DS1307 rtc;
 
-int new_time = 0, base_time = 0;
-
-int TIME_SECS = 0;
+int SECONDS_PASSED = 0;
 
 // setupClock
 void initTimer() {
@@ -25,9 +23,7 @@ void initTimer() {
 }
 
 bool isASecondPassed() {
-    new_time = rtc.getSeconds();
-
-    if (new_time - base_time >= 1) {
+    if (rtc.getSeconds() >= 1) {
         rtc.setTime(0, 0, 0);
         return true;
     }
@@ -37,11 +33,11 @@ bool isASecondPassed() {
 
 void updateTime() {
     if (!isASecondPassed()) return;
-    TIME_SECS += 1;
+    SECONDS_PASSED += 1;
 }
 
 int getTime() {
-    return TIME_SECS;
+    return SECONDS_PASSED;
 }
 
 #endif
