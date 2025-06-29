@@ -63,22 +63,18 @@ int MIN_POWER = 0;
 #define POWER_OPEN_COLLECTOR 100
 #define POWER_CLOSE_COLLECTOR 500
 #define POWER_HOLD_COLLECTOR 347
-#define TIME_SET_HOLD_FRUIT 800
-#define TIME_SET_COLLECTOR_CHANGE_SPEED 1000
+#define TIME_SET_HOLD_FRUIT 600
+#define TIME_SET_COLLECTOR_CHANGE_SPEED 600
 
-SimpleKalmanFilter gyro_x_stab(10, 6, 1);
-SimpleKalmanFilter gyro_y_stab(10, 6, 1);
-SimpleKalmanFilter gyro_z_stab(10, 6, 1);
-
-SimpleKalmanFilter joystick_y_stab(0.5, 0.01, 0.8);
-SimpleKalmanFilter joystick_x_stab(0.5, 0.01, 0.8);
+SimpleKalmanFilter joystick_x_filter(0.5, 0.01, 0.8);
+SimpleKalmanFilter joystick_y_filter(0.5, 0.01, 0.8);
 
 SimpleKalmanFilter motor_left_smooth(1, 1, 1);
 SimpleKalmanFilter motor_right_smooth(1, 1, 1);
 
 /*/////////////////////////////////////////////////////
 
-    All below here are temp variable for processing
+All below here are temp variable for processing
 
 */
 /////////////////////////////////////////////////////
@@ -119,9 +115,6 @@ int power_lift = 0;
 
 std::vector<int> MIN_VALUE = {128, 256, 512, 1024};
 
-float gyro_tick = 1;
-float ROLL = 0, PITCH = 0, YAW = 0;
-
 float console_x_axis = 0, console_y_axis = 0;
 float x_axis = 0, y_axis = 0;
 int left_power = 0, right_power = 0;
@@ -130,16 +123,5 @@ PIN left_pin, right_pin;
 
 std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(MAX_GEAR * 2 + 2, 0));    // lưu mức năng lượng
 std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(MAX_GEAR * 2 + 2, {0, 0})); // lưu chân pin
-
-// gyro data
-namespace GyroSettings {
-    int samples = 2000;
-    float A_OFFSET_X = 0, A_OFFSET_Y = 0, A_OFFSET_Z = 0;
-    float A_X = 0, A_Y = 0, A_Z = 0;
-    float MOVE_POINT = 0.3;
-    
-    float GYRO_OFFSET_X = 0, GYRO_OFFSET_Y = 0, GYRO_OFFSET_Z = 0;
-    float GYRO_X = 0, GYRO_Y = 0, GYRO_Z = 0;
-}
 
 #endif
