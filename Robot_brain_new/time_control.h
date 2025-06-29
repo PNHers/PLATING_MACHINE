@@ -1,7 +1,6 @@
 #ifndef TIME_CONTROL_H
 #define TIME_CONTROL_H
 
-
 #include "Arduino.h"
 #include <stdio.h>
 #include "I2C_RTC.h"
@@ -12,32 +11,37 @@ int new_time = 0, base_time = 0;
 
 int TIME_SECS = 0;
 
-void setup_timer(){
-  if(!rtc.begin()){
-    Serial.println("Module thoi gian khong duoc ket noi");
-    Serial.flush();
-    while(1);
-  }
-  rtc.setTime(0, 0, 0);
-  rtc.setDate(11, 9, 2001); // đừng hỏi vì sao :)
-  rtc.startClock();
-}
+// setupClock
+void initTimer() {
+    if (!rtc.begin()) {
+        Serial.println("Module thoi gian khong duoc ket noi");
+        Serial.flush();
+        return;
+    }
 
-bool a_seconds(int set_time){
-  new_time = rtc.getSeconds();
-  if(new_time - base_time >= set_time) {
     rtc.setTime(0, 0, 0);
-    return true;
-  }
-  return false;
+    rtc.setDate(11, 9, 2001); // đừng hỏi vì sao :)
+    rtc.startClock();
 }
 
-void tick_timer(){
-  if(a_seconds(1)) TIME_SECS += 1;
+bool isASecondPassed() {
+    new_time = rtc.getSeconds();
+
+    if (new_time - base_time >= 1) {
+        rtc.setTime(0, 0, 0);
+        return true;
+    }
+
+    return false;
 }
 
-int get_time(){
-  return TIME_SECS;
+void updateTime() {
+    if (!isASecondPassed()) return;
+    TIME_SECS += 1;
+}
+
+int getTime() {
+    return TIME_SECS;
 }
 
 #endif
