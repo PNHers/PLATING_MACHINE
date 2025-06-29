@@ -14,6 +14,16 @@
 
 const float sai_so = 0.01; // sai số
 
+int collector_rotation_angle = DEFAULT_ANGLE;
+
+bool Is_hold_collector_button = false;
+int time_base_collector = 0, time_now_collector = 0;
+int time_base_hold_fruit = 0;
+bool Is_counting_press_time = false;
+bool Is_press_twice = false;
+
+
+
 PS2X ps2x; // khởi tạo class PS2x
 
 // hàm này loại trừ sai số của tay cầm
@@ -198,5 +208,65 @@ void consoleRead() {
         is_reverse = true;
     }
 }
+
+void control_collector(Adafruit_PWMServoDriver* pwm){
+  if (ps2x.Button(PSB_GREEN) || ps2x.Button(PSB_BLUE)){
+    if (!Is_hold_collector_button){time_base_collector = millis();}
+    time_now_collector = millis();
+
+    if (time_now_collector - time_base_collector > TIME_SET_COLLECTOR_CHANGE_SPEED){
+      collector_rotation_angle += (ps2x.Button(PSB_GREEN))? 1 : -1;
+    }
+  }
+
+  if (ps2x.ButtonPressed(PSB_GREEN)){
+    Is_hold_collector_button = true;
+    collector_rotation_angle += 1;
+  }
+  else if (ps2x.ButtonPressed(PSB_BLUE)){
+    Is_hold_collector_button = true;
+    collector_rotation_angle -= 1;
+  }
+
+  Is_hold_collector_button = (ps2x.ButtonReleased(PSB_GREEN) || ps2x.ButtonReleased(PSB_BLUE))? false : Is_hold_collector_button;
+
+
+
+  if (collector_rotation_angle > 180) {collector_rotation_angle = 180;}
+  else if (collector_rotation_angle < 0) {collector_rotation_angle = 0;}
+
+  setServo180(pwm, COLLECTOR_ROTATION_PIN, collector_rotation_angle);
+
+  int collector_angle = 0;
+
+  if (ps2x.ButtonReleased(PSB_PINK)){
+    if (!Is_press_twice){
+      Is_counting_press_time = true;
+      time_base_hold_fruit = millis();
+    }
+    else {Is_press_twice = false;}
+  }
+
+  if (ps2x.Button(PSB_RED)){
+    collector_angle = POWER_OPEN_COLLECTOR;
+  }
+  else if (ps2x.Button(PSB_PINK)){
+    if (Is_press_twice){collector_angle = POWER_HOLD_COLLECTOR;}
+    else {collector_angle = POWER_CLOSE_COLLECTOR;}
+  }
+
+  if (Is_counting_press_time){
+    if (millis() - time_base_hold_fruit > TIME_SET_COLLECTOR_CHANGE_SPEED){
+      Is_counting_press_time = false;
+    }
+    else if (ps2x.Button(PSB_PINK)){
+      Is_press_twice = true;
+    }
+  }
+
+  setServo360(pwm, COLLECTOR_PIN, collector_angle);
+  
+}
+
 
 #endif

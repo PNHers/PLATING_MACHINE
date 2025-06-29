@@ -51,6 +51,21 @@ int MIN_POWER = 0;
 
 #define NOTIFY_LED 13
 
+#define MIN_ROTATE 80
+#define MAX_ROTATE 570
+
+#define DEFAULT_ANGLE 90
+#define MIN_ANGLE_DEFAULT 0
+#define MAX_ANGLE_DEFAULT 180
+#define COLLECTOR_PIN 3
+#define COLLECTOR_ROTATION_PIN 2
+
+#define POWER_OPEN_COLLECTOR 100
+#define POWER_CLOSE_COLLECTOR 500
+#define POWER_HOLD_COLLECTOR 347
+#define TIME_SET_HOLD_FRUIT 800
+#define TIME_SET_COLLECTOR_CHANGE_SPEED 1000
+
 SimpleKalmanFilter gyro_x_stab(10, 6, 1);
 SimpleKalmanFilter gyro_y_stab(10, 6, 1);
 SimpleKalmanFilter gyro_z_stab(10, 6, 1);

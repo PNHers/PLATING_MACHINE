@@ -75,6 +75,20 @@ void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver *pwm) {
     Serial.println(motor_info.pin2);
 }
 
+void setServo180(Adafruit_PWMServoDriver* pwm, uint8_t channel, int rotate_angle) {
+  //float handled_angle = (rotate_angle - MIN_ANGLE_DEFAULT)/ (MAX_ANGLE_DEFAULT - MIN_ANGLE_DEFAULT);
+  uint16_t pulse = (MAX_ROTATE - MIN_ROTATE)* rotate_angle/180 + MIN_ROTATE;
+  pwm->setPWM(channel, 0, pulse);
+  Serial.print("rotate collector arm at: ");
+  Serial.println(pulse);
+}
+
+void setServo360(Adafruit_PWMServoDriver* pwm, uint8_t channel, int rotate) { 
+  pwm->setPWM(channel, 0, rotate);
+  Serial.print("rotate collector at: ");
+  Serial.println(rotate);
+}
+
 void smooth_increase_decrease(int start, int end, int step, int pin1, int pin2, std::vector<Rotate> *list_rotate) {
     if (start == end) return;
 
