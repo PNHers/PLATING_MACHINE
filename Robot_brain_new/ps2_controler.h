@@ -57,6 +57,16 @@ void resetMotionState() {
     if (!ps2x.Button(GEAR_DOWN))  is_gear_down = false;
     if (!ps2x.Button(ZERO_FORCE)) is_zero_force = false;
     if (!ps2x.Button(REVERSE))    is_reverse = false;
+
+    if (!ps2x.Button(PSB_R1) && !ps2x.Button(PSB_R2)) {
+        is_motor_a = false;
+    }
+    if (!motor_power_A) is_motor_a_reverse = false;
+
+    if (!ps2x.Button(PSB_PAD_UP) && !ps2x.Button(PSB_PAD_DOWN)) {
+        is_motor_b = false;
+    }
+    if (!motor_power_B) is_motor_b_reverse = false;
 }
 
 void consoleRead() {
@@ -91,6 +101,24 @@ void consoleRead() {
         invert = !invert;
         Serial.println("reverse mode");
         is_reverse = true;
+    }
+
+    if (ps2x.Button(PSB_R1) && !is_motor_a && !motor_power_A){
+        is_motor_a = true;
+    }
+
+    if (ps2x.Button(PSB_R2) && !is_motor_a && !motor_power_A){
+        is_motor_a = true;
+        is_motor_a_reverse = true;
+    }
+
+    if (ps2x.Button(PSB_PAD_UP) && !is_motor_b && !motor_power_B){
+        is_motor_b = true;
+    }
+
+    if (ps2x.Button(PSB_PAD_DOWN) && !is_motor_b && !motor_power_B){
+        is_motor_b = true;
+        is_motor_b_reverse = true;
     }
 }
 

@@ -15,16 +15,22 @@ const float MIN_ACCEL = 0.3;
 * Z: Yaw
 */
 namespace GyroSettings {
+    SimpleKalmanFilter accel_x_filter(0.1, 0.1, 0.5);
+
     SimpleKalmanFilter gyro_x_filter(10, 6, 1);
     SimpleKalmanFilter gyro_y_filter(10, 6, 1);
     SimpleKalmanFilter gyro_z_filter(10, 6, 1);
 
-    float gyro_tick = 1.0f;
     float accel_x = 0, accel_y = 0, accel_z = 0;
     float gyro_x = 0, gyro_y = 0, gyro_z = 0;
     
     float gyro_offset_x = 0, gyro_offset_y = 0, gyro_offset_z = 0;
     float accel_offset_x = 0, accel_offset_y = 0, accel_offset_z = 0;
+
+    int oldVelocityTime = 0, newVelocityTime = 0;
+
+    //cm/s
+    float velocity = 0;
     
     // in degrees
     float roll = 0, pitch = 0, yaw = 0;
@@ -106,11 +112,19 @@ void get_accel() {
     gyro_x = myIMU.readFloatGyroX() - gyro_offset_x;
     gyro_y = myIMU.readFloatGyroY() - gyro_offset_y;
     gyro_z = myIMU.readFloatGyroZ() - gyro_offset_z;
+
+    accel_x = accel_x_filter.updateEstimate(accel_x);
 }
 
 bool isRobotMoving() {
     using namespace GyroSettings;
     return (abs(accel_x) > MIN_ACCEL || abs(accel_y) > MIN_ACCEL || abs(accel_z) > MIN_ACCEL);
+}
+
+void calculateVelocity(){
+    GyroSettings::newVelocityTime = millis();
+    GyroSettings::velocity += (GyroSettings::accel_x * 9.81f) / ((GyroSettings::newVelocityTime - GyroSettings::oldVelocityTime) * 1e-3);
+    GyroSettings::oldVelocityTime = millis();
 }
 
 #endif

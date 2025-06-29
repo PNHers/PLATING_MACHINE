@@ -12,7 +12,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 #define GEAR_UP PSB_L2
 #define GEAR_DOWN PSB_L1
 #define ZERO_FORCE PSB_L3
-#define REVERSE PSB_R3
+#define REVERSE PSB_R3 
 
 // MOTOR SETTING
 
@@ -72,6 +72,9 @@ SimpleKalmanFilter joystick_y_filter(0.5, 0.01, 0.8);
 SimpleKalmanFilter motor_left_smooth(1, 1, 1);
 SimpleKalmanFilter motor_right_smooth(1, 1, 1);
 
+SimpleKalmanFilter motor_A_smooth(1, 1, 1);
+SimpleKalmanFilter motor_B_smooth(1, 1, 1);
+
 /*/////////////////////////////////////////////////////
 
 All below here are temp variable for processing
@@ -102,6 +105,10 @@ namespace ControlState {
     bool fast_stop       = false;
     bool is_rotate_left  = false;
     bool is_rotate_right = false;
+    bool is_motor_a      = false;
+    bool is_motor_b      = false;
+    bool is_motor_a_reverse = false;
+    bool is_motor_b_reverse = false;
 }
 
 int CURRENT_GEAR = 0;
@@ -112,6 +119,8 @@ int current_power_left = 0, current_power_right = 0;
 int new_power_left = 0, new_power_right = 0;
 
 int power_lift = 0;
+
+int motor_power_A = 0, motor_power_B = 0;
 
 std::vector<int> MIN_VALUE = {128, 256, 512, 1024};
 

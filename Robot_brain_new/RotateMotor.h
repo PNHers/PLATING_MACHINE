@@ -24,7 +24,7 @@ struct Rotate {
     int pin2;
 };
 
-// ý là cái hàm này không xài nhưng vẫn giữ lại đây =))
+// ý là cái hàm này không xài nhưng vẫn giữ lại đây =)) // gan den ngay di thi moi xai :)))))))
 void swap(int &a, int &b) {
     int temp = a;
     a = b;
@@ -229,8 +229,7 @@ void self_rotate() {
 }
 
 void setPWMMotors2(int *power, PIN *pin) {
-    if (*power < 0)
-        return;
+    if (*power < 0 && *power > 4096) return;
     // pwm.setPin(pin->pin1, *power);
     // pwm.setPin(pin->pin2, 0);
     // delay(50);
@@ -251,6 +250,7 @@ void smooth_motor(int *left_motor, int *right_motor) {
     setPWMMotors2(&right_power, &right_pin);
 }
 
+// tu tu roi lam :)
 void check_min_power() {
     Serial.println("checking min power");
     delay(1000);
@@ -274,6 +274,26 @@ void check_min_power() {
 
         delay(1000);
     }
+}
+
+void motorPowerChange(bool is_lift, int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
+    // if (motorPower == 0) return;
+    if(is_swap) swap(pin1, pin2);
+
+    if(is_lift) motorPower = 4096;
+    else motorPower = 0;
+
+    motorPower = motor_filter->updateEstimate(motorPower);
+
+    PIN pin = {pin1, pin2};
+
+    setPWMMotors2(&motorPower, &pin);
+}
+
+void motorControl(){
+    using namespace ControlState;
+    motorPowerChange(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
+    motorPowerChange(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
 }
 
 #endif

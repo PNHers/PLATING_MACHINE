@@ -9,6 +9,8 @@
 
 // int BASE_TIME = 0 , TIME = 0, NEW_TIME = 0, DEM = 0;
 
+TaskHandle_t Task0;
+
 void checkStatus(float y_axis) {
     if (ControlState::invert) {
         y_axis *= -1;
@@ -40,14 +42,36 @@ void setup() {
     Serial.println("test");
     Div_level();
 
-    initTimer();
+    // initTimer();
     // // gyro_setup_tick();
     // gyro_tick = 1.0 / myIMU.getGyroDataRate();
     // Serial.println(myIMU.getGyroDataRate());
+
+    GyroSettings::oldVelocityTime = millis();
+    xTaskCreatePinnedToCore(
+                xTask0,   /* Task function. */
+                "Gyroscope, accel & time",     /* name of task. */
+                10000,       /* Stack size of task */
+                NULL,        /* parameter of the task */
+                1,           /* priority of the task */
+                &Task0,      /* Task handle to keep track of created task */
+                0);          /* pin task to core 0 */   
+
     Serial.println("Initialation success!");
 }
 
+void xTask0( void * pvParameters ){
+    while(true){
+        // get_accel();
+        // calculateVelocity();
+        // Serial.println(GyroSettings::velocity);
+        // Serial.println(GyroSettings::accel_x);
+        delay(50);
+    }
+}
+
 void loop() {
+    
     using namespace ControlState;
     // // tick_timer();
     // get_accel();
@@ -56,6 +80,8 @@ void loop() {
     // controlCollector(&pwm);
 
     consoleRead();
+    motorControl();
+
     positionOfJoystick(console_x_axis, console_y_axis);
     checkStatus(console_y_axis);
 
@@ -95,26 +121,8 @@ void loop() {
     if (fast_stop && !current_power_left && !current_power_right) fast_stop = false;
     resetMotionState();
 
-    // Serial.print(A_X);
-    // Serial.print(",");
-    // Serial.print(A_Y);
-    // Serial.print(",");
-    // Serial.println(A_Z);
-
-    // Serial.print(GYRO_X);
-    // Serial.print(",");
-    // Serial.print(GYRO_Y);
-    // Serial.print(",");
-    // Serial.print(GYRO_Z);
-    // Serial.print(",");
-
-    // Serial.print(ROLL);
-    // Serial.print(",");
-    // Serial.print(PITCH);
-    // Serial.print(",");
-    // Serial.println(YAW);
 
     // if(detect_movement()) Serial.println("Object is moving!");
 
-    delay(100);
+    delay(20);
 }
