@@ -233,16 +233,41 @@ void self_rotate() {
     is_rotate_right = false;
 }
 
+//               pin :8,9,10,11,12,13,14,15
+int Motor_speed[8] = {0,0,0 ,0 ,0 ,0 ,0 ,0};
+
 void setPWMMotors2(int *power, PIN *pin) {
     if (*power < 0 || *power > 4096) return;
+    int power_current1 = Motor_speed[pin->pin1 - 8];
+    // int power_current2 = Motor_speed[pin->pin2];
+    if (power_current1 * (*power) == 0 ) {
+        // pwm.setPin(pin->pin1, 0);
+        // pwm.setPin(pin->pin2, 0);
+        // delay(50);
+        
+        Serial.print(0);
+        Serial.print(" pin: ");
+        Serial.print(pin->pin1);
+        Serial.print(" ");
+        Serial.println(pin->pin2);
+
+        Motor_speed[pin->pin1 - 8] = 0;
+        Motor_speed[pin->pin2 - 8] = 0;
+        return;
+    }
+    
     // pwm.setPin(pin->pin1, *power);
     // pwm.setPin(pin->pin2, 0);
     // delay(50);
+    
     Serial.print(*power);
     Serial.print(" pin: ");
     Serial.print(pin->pin1);
     Serial.print(" ");
     Serial.println(pin->pin2);
+
+    Motor_speed[pin->pin1 - 8] = *power;
+    Motor_speed[pin->pin2 - 8] = 0;
 }
 
 void smooth_motor(int *left_motor, int *right_motor) {
