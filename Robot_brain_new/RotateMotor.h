@@ -88,13 +88,13 @@ void setServo180(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate_angle
 }
 
 void setServo360(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate) {
-    // pwm->setPWM(channel, 0, 0);
+    pwm->setPWM(channel, 0, 0);
     pwm->setPWM(channel, 0, rotate);
     Serial.print("rotate collector at: ");
     Serial.println(rotate);
-    // pwm->setPWM(channel, 0, 0);
+    delay(20);
+    pwm->setPWM(channel, 0, 0);
 }
-
 // làm motor dừng từ từ nhưng nhanh
 void instantSmoothBrake() {
     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
