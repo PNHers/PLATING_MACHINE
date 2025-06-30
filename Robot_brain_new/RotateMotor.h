@@ -241,19 +241,18 @@ void setPWMMotors2(int *power, PIN *pin) {
     int power_current1 = Motor_speed[pin->pin1 - 8];
     // int power_current2 = Motor_speed[pin->pin2];
     if (power_current1 * (*power) == 0 ) {
-        // pwm.setPin(pin->pin1, 0);
-        // pwm.setPin(pin->pin2, 0);
-        // delay(50);
         
-        Serial.print(0);
-        Serial.print(" pin: ");
-        Serial.print(pin->pin1);
-        Serial.print(" ");
-        Serial.println(pin->pin2);
 
-        Motor_speed[pin->pin1 - 8] = 0;
-        Motor_speed[pin->pin2 - 8] = 0;
-        return;
+        if (Motor_speed[pin->pin2 - 8] != 0 && (*power) != 0){
+            Serial.print("error set power wrong");
+            // pwm.setPin(pin->pin1, 0);
+            // pwm.setPin(pin->pin2, 0);
+            // delay(50);
+
+            Motor_speed[pin->pin1 - 8] = 0;
+            Motor_speed[pin->pin2 - 8] = 0;
+            return;
+        }
     }
     
     // pwm.setPin(pin->pin1, *power);
