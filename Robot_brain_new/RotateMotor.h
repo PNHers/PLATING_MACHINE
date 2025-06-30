@@ -316,6 +316,18 @@ void motorControl() {
     using namespace ControlState;
     motorPowerChange(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
     motorPowerChange(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
+
+    switch (CURRENT_GEAR){
+        case 1:
+            // move but slowly, need calibrate by accelermeter. when rotate, one wheel will be lock
+        case 2:
+            // moving at medium speed. when roate, one wheel going to be faster than other 
+        case 3:
+            // moving at maximun speed (the max value user setting). when rotate, one wheel going to be slower than other
+        default:
+            motorPowerChange(false, 0, 8, 9, is_motor_left_reverse,  &motor_left_smooth);
+            motorPowerChange(false, 0, 10, 10, is_motor_right_reverse,  &motor_right_smooth);
+    }
 }
 
 

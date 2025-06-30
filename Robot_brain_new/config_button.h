@@ -24,7 +24,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 int MIN_POWER = 0;
 #define MAX_POWER 2048
-#define MAX_GEAR 4
+#define MAX_GEAR 3
 #define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn MAX_GEAR
 #define when_to_rotate 0.2 // khi nào robot nên xoay
 #define CHANGE_PULL 1
