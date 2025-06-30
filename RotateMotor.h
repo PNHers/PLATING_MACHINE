@@ -130,6 +130,7 @@ void move2() {
     //  Serial.println(CURRENT_GEAR);
     if (ControlState::invert && CURRENT_GEAR > 0)
         CURRENT_GEAR *= -1;
+
     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + CURRENT_GEAR];
     right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + CURRENT_GEAR];
 
@@ -156,6 +157,7 @@ void move2() {
 
             new_power_right = max(new_power_right, 0);
         }
+
         if (x_axis < 0) {
             new_power_left -= power_lift * -x_axis;
 
@@ -181,7 +183,7 @@ void move2() {
 void self_rotate() {
     using namespace ControlState;
 
-    if(fast_stop) return;
+    if (fast_stop) return;
 
     correctGearSpeed();
     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
@@ -196,17 +198,20 @@ void self_rotate() {
             right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
             is_rotate_right = true;
         }
+
         if (x_axis < 0 && !is_rotate_right) {
             new_power_left  = min(new_power_left  - delta_x_power, self_rotate_gap);
             new_power_right = min(new_power_right - delta_x_power, self_rotate_gap);
             left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
             is_rotate_left = true;
         }
+
         if (x_axis > 0 && is_rotate_left) {
             new_power_left  = max(new_power_left  - self_rotate_gap, 0);
             new_power_right = max(new_power_right - self_rotate_gap, 0);
             left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
         }
+
         if (x_axis < 0 && is_rotate_right) {
             new_power_left  = max(new_power_left  - self_rotate_gap, 0);
             new_power_right = max(new_power_right - self_rotate_gap, 0);
@@ -229,7 +234,7 @@ void self_rotate() {
 }
 
 void setPWMMotors2(int *power, PIN *pin) {
-    if (*power < 0 && *power > 4096) return;
+    if (*power < 0 || *power > 4096) return;
     // pwm.setPin(pin->pin1, *power);
     // pwm.setPin(pin->pin2, 0);
     // delay(50);
@@ -278,11 +283,9 @@ void check_min_power() {
 
 void motorPowerChange(bool is_lift, int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
     // if (motorPower == 0) return;
-    if(is_swap) swap(pin1, pin2);
+    if (is_swap) swap(pin1, pin2);
 
-    if(is_lift) motorPower = 4096;
-    else motorPower = 0;
-
+    motorPower = is_lift ? 4096 : 0;
     motorPower = motor_filter->updateEstimate(motorPower);
 
     PIN pin = {pin1, pin2};
@@ -290,7 +293,7 @@ void motorPowerChange(bool is_lift, int& motorPower, int pin1, int pin2, bool is
     setPWMMotors2(&motorPower, &pin);
 }
 
-void motorControl(){
+void motorControl() {
     using namespace ControlState;
     motorPowerChange(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
     motorPowerChange(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
