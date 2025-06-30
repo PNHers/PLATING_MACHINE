@@ -109,8 +109,8 @@ void loop() {
 
     // // rotate_2_motor(left_motor, right_motor, &pwm);
 
-    // motorControl();
-    // smooth_motor(&new_power_left, &new_power_right);
+    motorControl();
+    smooth_motor(&new_power_left, &new_power_right);
 
     current_power_left = new_power_left;
     current_power_right = new_power_right;

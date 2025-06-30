@@ -46,7 +46,8 @@ void positionOfJoystick(float &x_axis, float &y_axis) {
 }
 
 void smoothenJoystick() {
-    x_axis = joystick_x_filter.updateEstimate(console_x_axis);
+    // x_axis = joystick_x_filter.updateEstimate(console_x_axis);
+    x_axis = console_x_axis;
     y_axis = joystick_y_filter.updateEstimate(console_y_axis);
 }
 

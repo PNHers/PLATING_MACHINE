@@ -193,7 +193,7 @@ void self_rotate() {
 
     if (abs(x_axis) > when_to_rotate) {
         if (x_axis > 0 && !is_rotate_left) {
-            new_power_left  = min(new_power_left  + delta_x_power, self_rotate_gap);
+            // new_power_left  = min(new_power_left  + delta_x_power, self_rotate_gap);
             new_power_right = min(new_power_right + delta_x_power, self_rotate_gap);
             right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
             is_rotate_right = true;
@@ -201,20 +201,20 @@ void self_rotate() {
 
         if (x_axis < 0 && !is_rotate_right) {
             new_power_left  = min(new_power_left  - delta_x_power, self_rotate_gap);
-            new_power_right = min(new_power_right - delta_x_power, self_rotate_gap);
+            // new_power_right = min(new_power_right - delta_x_power, self_rotate_gap);
             left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
             is_rotate_left = true;
         }
 
         if (x_axis > 0 && is_rotate_left) {
-            new_power_left  = max(new_power_left  - self_rotate_gap, 0);
+            // new_power_left  = max(new_power_left  - self_rotate_gap, 0);
             new_power_right = max(new_power_right - self_rotate_gap, 0);
             left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
         }
 
         if (x_axis < 0 && is_rotate_right) {
             new_power_left  = max(new_power_left  - self_rotate_gap, 0);
-            new_power_right = max(new_power_right - self_rotate_gap, 0);
+            // new_power_right = max(new_power_right - self_rotate_gap, 0);
             right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
         }
     } else if (is_rotate_right || is_rotate_left) {
@@ -244,26 +244,23 @@ void setPWMMotors2(int *power, PIN *pin) {
         
 
         if (Motor_speed[pin->pin2 - 8] != 0 && (*power) != 0){
-            Serial.print("error set power wrong");
+            Serial.println("////////////////////////////// error set power wrong //////////////////////////////////////");
             // pwm.setPin(pin->pin1, 0);
             // pwm.setPin(pin->pin2, 0);
             // delay(50);
-
-            Motor_speed[pin->pin1 - 8] = 0;
-            Motor_speed[pin->pin2 - 8] = 0;
-            return;
+            *power = 0;
         }
     }
     
-    // pwm.setPin(pin->pin1, *power);
-    // pwm.setPin(pin->pin2, 0);
+    pwm.setPin(pin->pin1, *power);
+    pwm.setPin(pin->pin2, 0);
     // delay(50);
     
-    Serial.print(*power);
-    Serial.print(" pin: ");
-    Serial.print(pin->pin1);
-    Serial.print(" ");
-    Serial.println(pin->pin2);
+    // Serial.print(*power);
+    // Serial.print(" pin: ");
+    // Serial.print(pin->pin1);
+    // Serial.print(" ");
+    // Serial.println(pin->pin2);
 
     Motor_speed[pin->pin1 - 8] = *power;
     Motor_speed[pin->pin2 - 8] = 0;
