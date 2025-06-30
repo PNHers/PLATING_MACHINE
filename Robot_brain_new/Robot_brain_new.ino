@@ -80,7 +80,6 @@ void loop() {
     // controlCollector(&pwm);
 
     consoleRead();
-    motorControl();
 
     positionOfJoystick(console_x_axis, console_y_axis);
     checkStatus(console_y_axis);
@@ -110,7 +109,8 @@ void loop() {
 
     // // rotate_2_motor(left_motor, right_motor, &pwm);
 
-    smooth_motor(&new_power_left, &new_power_right);
+    // motorControl();
+    // smooth_motor(&new_power_left, &new_power_right);
 
     current_power_left = new_power_left;
     current_power_right = new_power_right;
