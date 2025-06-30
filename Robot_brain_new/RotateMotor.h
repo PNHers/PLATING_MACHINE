@@ -166,8 +166,6 @@ void move2() {
             
             new_power_left = max(new_power_left, 0);
         }
-
-        delay(50);
     } else {
         if (new_power_left > new_power_right) {
             new_power_right = min(new_power_right + power_lift, new_power_left);
@@ -318,6 +316,11 @@ void motorControl() {
     using namespace ControlState;
     motorPowerChange(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
     motorPowerChange(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
+}
+
+
+void move3(){ //hẹ hẹ hẹ
+
 }
 
 #endif

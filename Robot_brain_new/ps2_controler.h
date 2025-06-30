@@ -121,6 +121,16 @@ void consoleRead() {
         is_motor_b = true;
         is_motor_b_reverse = true;
     }
+
+    if (y_axis == 1 && !is_motor_left && !is_motor_right && !motor_power_left && !motor_power_right){
+        is_motor_left = true;
+        is_motor_right = true;
+    }
+
+    if (y_axis == 0 && is_motor_left && is_motor_right){
+        is_motor_left = false;
+        is_motor_right = false;
+    }
 }
 
 void controlCollector(Adafruit_PWMServoDriver *pwm) {

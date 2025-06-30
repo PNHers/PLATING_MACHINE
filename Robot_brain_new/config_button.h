@@ -109,6 +109,11 @@ namespace ControlState {
     bool is_motor_b      = false;
     bool is_motor_a_reverse = false;
     bool is_motor_b_reverse = false;
+
+    bool is_motor_left   = false;
+    bool is_motor_right  = false;
+    bool is_motor_left_revers5e = false;
+    bool is_motor_right_reverse = false;
 }
 
 int CURRENT_GEAR = 0;

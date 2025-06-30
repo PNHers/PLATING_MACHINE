@@ -79,12 +79,11 @@ void loop() {
 
     // controlCollector(&pwm);
 
-    consoleRead();
 
     positionOfJoystick(console_x_axis, console_y_axis);
     checkStatus(console_y_axis);
-
     smoothenJoystick();
+    consoleRead();
 
     // // Serial.print(console_y_axis);
     // // Serial.print(",");
