@@ -29,7 +29,7 @@ int MIN_POWER = 0;
 #define when_to_rotate 0.2 // khi nào robot nên xoay
 #define CHANGE_PULL 1
 #define BRAKE 3
-#define TURN_RATIO 40        // %
+// #define TURN_RATIO 40        // %
 #define SELF_ROTATE_RATIO 30 // %
 
 #define LEFT 0
@@ -112,7 +112,7 @@ namespace ControlState {
 
     bool is_motor_left   = false;
     bool is_motor_right  = false;
-    bool is_motor_left_revers5e = false;
+    bool is_motor_left_reverse = false;
     bool is_motor_right_reverse = false;
 }
 
@@ -135,7 +135,7 @@ int left_power = 0, right_power = 0;
 
 PIN left_pin, right_pin;
 
-std::vector<std::vector<int>> POWER_LEVEL(2, std::vector<int>(MAX_GEAR * 2 + 2, 0));    // lưu mức năng lượng
-std::vector<std::vector<PIN>> MOTOR_PIN(2, std::vector<PIN>(MAX_GEAR * 2 + 2, {0, 0})); // lưu chân pin
+std::vector<int> POWER_LEVEL(MAX_GEAR, 0);    // lưu mức năng lượng
+std::vector<int> TURN_RATIO = { 0 , 50, 40, 30};
 
 #endif

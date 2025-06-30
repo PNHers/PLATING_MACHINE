@@ -48,7 +48,8 @@ void positionOfJoystick(float &x_axis, float &y_axis) {
 void smoothenJoystick() {
     // x_axis = joystick_x_filter.updateEstimate(console_x_axis);
     x_axis = console_x_axis;
-    y_axis = joystick_y_filter.updateEstimate(console_y_axis);
+    // y_axis = joystick_y_filter.updateEstimate(console_y_axis);
+    y_axis = console_y_axis;
 }
 
 void resetMotionState() {
@@ -89,17 +90,17 @@ void consoleRead() {
 
     if (ps2x.Button(ZERO_FORCE) && !is_zero_force) {
         CURRENT_GEAR = 0;
-        instantSmoothBrake();
+        // instantSmoothBrake();
         fast_stop = true;
         Serial.println(CURRENT_GEAR);
         is_zero_force = true;
     }
 
     if (ps2x.Button(REVERSE) && !is_reverse) {
-        instantSmoothBrake();
+        // instantSmoothBrake();
         fast_stop = true;
         CURRENT_GEAR = 0;
-        invert = !invert;
+        invert = is_motor_right_reverse = is_motor_left_reverse = !invert;
         Serial.println("reverse mode");
         is_reverse = true;
     }
@@ -122,7 +123,7 @@ void consoleRead() {
         is_motor_b_reverse = true;
     }
 
-    if (y_axis == 1 && !is_motor_left && !is_motor_right && !motor_power_left && !motor_power_right){
+    if (y_axis == 1 && !is_motor_left && !is_motor_right && !left_power && !right_power){
         is_motor_left = true;
         is_motor_right = true;
     }

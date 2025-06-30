@@ -15,6 +15,8 @@
 
 // Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+using namespace ControlState;
+
 int MAX_LEVEL = MAX_GEAR + MAX_GEAR;
 bool already_pull = false, is_rotate = false;
 
@@ -34,27 +36,12 @@ void swap(int &a, int &b) {
 // lưu các giá trị vào ma trận
 void Div_level() {
     int temp = (MAX_POWER - MIN_POWER) / MAX_GEAR;
-    POWER_LEVEL[LEFT][MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR] = MIN_POWER;
+    POWER_LEVEL[0] = MIN_POWER;
 
-    for (int i = 1; i <= MAX_GEAR; i++) {
-        POWER_LEVEL[LEFT][i + MAX_GEAR] = POWER_LEVEL[LEFT][i + MAX_GEAR - 1] + temp;
-        POWER_LEVEL[RIGHT][i + MAX_GEAR] = POWER_LEVEL[RIGHT][i + MAX_GEAR - 1] + temp;
-        MOTOR_PIN[LEFT][i + MAX_GEAR] = {LEFT_PIN_1, LEFT_PIN_2};
-        MOTOR_PIN[RIGHT][i + MAX_GEAR] = {RIGHT_PIN_1, RIGHT_PIN_2};
-    }
+    for (int i = 1; i <= MAX_GEAR; i++) POWER_LEVEL[i] = POWER_LEVEL[i - 1] + temp;
 
-    int k = MAX_GEAR + MAX_GEAR;
-    for (int i = 0; i < MAX_GEAR; i++) {
-        POWER_LEVEL[LEFT][i] = POWER_LEVEL[LEFT][k];
-        POWER_LEVEL[RIGHT][i] = POWER_LEVEL[RIGHT][k];
-        k--;
-        MOTOR_PIN[LEFT][i] = {LEFT_PIN_2, LEFT_PIN_1};
-        MOTOR_PIN[RIGHT][i] = {RIGHT_PIN_2, RIGHT_PIN_1};
-    }
-
-    POWER_LEVEL[LEFT][0] = POWER_LEVEL[RIGHT][0] = MAX_POWER;
-    POWER_LEVEL[LEFT][MAX_GEAR + MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR + MAX_GEAR] = MAX_POWER;
-    POWER_LEVEL[LEFT][MAX_GEAR] = POWER_LEVEL[RIGHT][MAX_GEAR] = 0;
+    POWER_LEVEL[MAX_GEAR] = MAX_POWER;
+    POWER_LEVEL[0] = 0;
 
     power_lift = temp / 2;
     self_rotate_gap = (MAX_POWER - MIN_POWER) * (SELF_ROTATE_RATIO / 100.0);
@@ -96,140 +83,140 @@ void setServo360(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate) {
     pwm->setPWM(channel, 0, 0);
 }
 // làm motor dừng từ từ nhưng nhanh
-void instantSmoothBrake() {
-    left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
-    right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
+// void instantSmoothBrake() {
+//     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
+//     right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
 
-    if (ControlState::invert) {
-        left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
-        right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
-    }
+//     if (ControlState::invert) {
+//         left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
+//         right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+//     }
 
-    if(ControlState::invert) Serial.println("he he he");
+//     if(ControlState::invert) Serial.println("he he he");
 
-    while (new_power_left != 0 || new_power_right != 0) {
-        new_power_left  = max(new_power_left  - power_lift, 0);
-        new_power_right = max(new_power_right - power_lift, 0);
-        smooth_motor(&new_power_left, &new_power_right);
-        delay(10);
-    }
-}
+//     while (new_power_left != 0 || new_power_right != 0) {
+//         new_power_left  = max(new_power_left  - power_lift, 0);
+//         new_power_right = max(new_power_right - power_lift, 0);
+//         smooth_motor(&new_power_left, &new_power_right);
+//         delay(10);
+//     }
+// }
 
 // luôn đi đúng tốc độ // kiểu như là đang đi hết ga số 3 thì lùi về số 2 chắc chắn xe sẽ giảm tốc cho phù hợp với số 2
-void correctGearSpeed() {
-    if (!(new_power_left > POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] ||
-          new_power_right > POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR])) return;
+// void correctGearSpeed() {
+//     if (!(new_power_left > POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR] ||
+//           new_power_right > POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR])) return;
 
-    new_power_left  = min(new_power_left  - power_lift, POWER_LEVEL[LEFT][MAX_GEAR  + CURRENT_GEAR]);
-    new_power_right = min(new_power_right - power_lift, POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]);
+//     new_power_left  = min(new_power_left  - power_lift, POWER_LEVEL[LEFT][MAX_GEAR  + CURRENT_GEAR]);
+//     new_power_right = min(new_power_right - power_lift, POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]);
 
-    delay(100);
-}
+//     delay(100);
+// }
 
-void move2() {
-    //  Serial.println(CURRENT_GEAR);
-    if (ControlState::invert && CURRENT_GEAR > 0)
-        CURRENT_GEAR *= -1;
+// void move2() {
+//     //  Serial.println(CURRENT_GEAR);
+//     if (ControlState::invert && CURRENT_GEAR > 0)
+//         CURRENT_GEAR *= -1;
 
-    left_pin = MOTOR_PIN[LEFT][MAX_GEAR + CURRENT_GEAR];
-    right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + CURRENT_GEAR];
+//     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + CURRENT_GEAR];
+//     right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + CURRENT_GEAR];
 
-    if (robot_status == 1) {
-        new_power_left  = min(new_power_left  + (int)(power_lift * y_axis), POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR]);
-        new_power_right = min(new_power_right + (int)(power_lift * y_axis), POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]);
-        delay(100);
-    }
+//     if (robot_status == 1) {
+//         new_power_left  = min(new_power_left  + (int)(power_lift * y_axis), POWER_LEVEL[LEFT][MAX_GEAR + CURRENT_GEAR]);
+//         new_power_right = min(new_power_right + (int)(power_lift * y_axis), POWER_LEVEL[RIGHT][MAX_GEAR + CURRENT_GEAR]);
+//         delay(100);
+//     }
 
-    if (robot_status == -1) {
-        new_power_left  = max(new_power_left  + (int)(power_lift * y_axis), 0);
-        new_power_right = max(new_power_right + (int)(power_lift * y_axis), 0);
-        delay(50);
-    }
+//     if (robot_status == -1) {
+//         new_power_left  = max(new_power_left  + (int)(power_lift * y_axis), 0);
+//         new_power_right = max(new_power_right + (int)(power_lift * y_axis), 0);
+//         delay(50);
+//     }
 
-    correctGearSpeed();
+//     correctGearSpeed();
 
-    if (abs(x_axis) > when_to_rotate) {
-        if (x_axis > 0) {
-            new_power_right -= power_lift * x_axis;
+//     if (abs(x_axis) > when_to_rotate) {
+//         if (x_axis > 0) {
+//             new_power_right -= power_lift * x_axis;
 
-            if (new_power_left - new_power_right > max_different_rotate)
-                new_power_right = new_power_left - max_different_rotate;
+//             if (new_power_left - new_power_right > max_different_rotate)
+//                 new_power_right = new_power_left - max_different_rotate;
 
-            new_power_right = max(new_power_right, 0);
-        }
+//             new_power_right = max(new_power_right, 0);
+//         }
 
-        if (x_axis < 0) {
-            new_power_left -= power_lift * -x_axis;
+//         if (x_axis < 0) {
+//             new_power_left -= power_lift * -x_axis;
 
-            if (new_power_right - new_power_left > max_different_rotate)
-                new_power_left = new_power_right - max_different_rotate;
+//             if (new_power_right - new_power_left > max_different_rotate)
+//                 new_power_left = new_power_right - max_different_rotate;
             
-            new_power_left = max(new_power_left, 0);
-        }
-    } else {
-        if (new_power_left > new_power_right) {
-            new_power_right = min(new_power_right + power_lift, new_power_left);
-        } else if (new_power_left < new_power_right) {
-            new_power_left = min(new_power_left + power_lift, new_power_right);
-        }
-    }
+//             new_power_left = max(new_power_left, 0);
+//         }
+//     } else {
+//         if (new_power_left > new_power_right) {
+//             new_power_right = min(new_power_right + power_lift, new_power_left);
+//         } else if (new_power_left < new_power_right) {
+//             new_power_left = min(new_power_left + power_lift, new_power_right);
+//         }
+//     }
 
-    if (ControlState::invert && CURRENT_GEAR < 0)
-        CURRENT_GEAR *= -1;
-}
+//     if (ControlState::invert && CURRENT_GEAR < 0)
+//         CURRENT_GEAR *= -1;
+// }
 
-void self_rotate() {
-    using namespace ControlState;
+// void self_rotate() {
+//     using namespace ControlState;
 
-    if (fast_stop) return;
+//     if (fast_stop) return;
 
-    correctGearSpeed();
-    left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
-    right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
+//     correctGearSpeed();
+//     left_pin = MOTOR_PIN[LEFT][MAX_GEAR + 1];
+//     right_pin = MOTOR_PIN[RIGHT][MAX_GEAR + 1];
 
-    int delta_x_power = self_rotate_gap * x_axis;
+//     int delta_x_power = self_rotate_gap * x_axis;
 
-    if (abs(x_axis) > when_to_rotate) {
-        if (x_axis > 0 && !is_rotate_left) {
-            // new_power_left  = min(new_power_left  + delta_x_power, self_rotate_gap);
-            new_power_right = min(new_power_right + delta_x_power, self_rotate_gap);
-            right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
-            is_rotate_right = true;
-        }
+//     if (abs(x_axis) > when_to_rotate) {
+//         if (x_axis > 0 && !is_rotate_left) {
+//             // new_power_left  = min(new_power_left  + delta_x_power, self_rotate_gap);
+//             new_power_right = min(new_power_right + delta_x_power, self_rotate_gap);
+//             right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+//             is_rotate_right = true;
+//         }
 
-        if (x_axis < 0 && !is_rotate_right) {
-            new_power_left  = min(new_power_left  - delta_x_power, self_rotate_gap);
-            // new_power_right = min(new_power_right - delta_x_power, self_rotate_gap);
-            left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
-            is_rotate_left = true;
-        }
+//         if (x_axis < 0 && !is_rotate_right) {
+//             new_power_left  = min(new_power_left  - delta_x_power, self_rotate_gap);
+//             // new_power_right = min(new_power_right - delta_x_power, self_rotate_gap);
+//             left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
+//             is_rotate_left = true;
+//         }
 
-        if (x_axis > 0 && is_rotate_left) {
-            // new_power_left  = max(new_power_left  - self_rotate_gap, 0);
-            new_power_right = max(new_power_right - self_rotate_gap, 0);
-            left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
-        }
+//         if (x_axis > 0 && is_rotate_left) {
+//             // new_power_left  = max(new_power_left  - self_rotate_gap, 0);
+//             new_power_right = max(new_power_right - self_rotate_gap, 0);
+//             left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
+//         }
 
-        if (x_axis < 0 && is_rotate_right) {
-            new_power_left  = max(new_power_left  - self_rotate_gap, 0);
-            // new_power_right = max(new_power_right - self_rotate_gap, 0);
-            right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
-        }
-    } else if (is_rotate_right || is_rotate_left) {
-        new_power_left  = max(new_power_left  - self_rotate_gap, 0);
-        new_power_right = max(new_power_right - self_rotate_gap, 0);
+//         if (x_axis < 0 && is_rotate_right) {
+//             new_power_left  = max(new_power_left  - self_rotate_gap, 0);
+//             // new_power_right = max(new_power_right - self_rotate_gap, 0);
+//             right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+//         }
+//     } else if (is_rotate_right || is_rotate_left) {
+//         new_power_left  = max(new_power_left  - self_rotate_gap, 0);
+//         new_power_right = max(new_power_right - self_rotate_gap, 0);
         
-        if (is_rotate_right) {
-            right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
-        } else if (is_rotate_left) {
-            left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
-        }
-    }
+//         if (is_rotate_right) {
+//             right_pin = MOTOR_PIN[RIGHT][MAX_GEAR - 1];
+//         } else if (is_rotate_left) {
+//             left_pin = MOTOR_PIN[LEFT][MAX_GEAR - 1];
+//         }
+//     }
 
-    if (!(is_rotate_left || is_rotate_right) || !(new_power_left == new_power_right) || !(0 == new_power_left)) return;
-    is_rotate_left = false;
-    is_rotate_right = false;
-}
+//     if (!(is_rotate_left || is_rotate_right) || !(new_power_left == new_power_right) || !(0 == new_power_left)) return;
+//     is_rotate_left = false;
+//     is_rotate_right = false;
+// }
 
 //               pin :8,9,10,11,12,13,14,15
 int Motor_speed[8] = {0,0,0 ,0 ,0 ,0 ,0 ,0};
@@ -254,25 +241,25 @@ void setPWMMotors2(int *power, PIN *pin) {
     pwm.setPin(pin->pin2, 0);
     // delay(50);
     
-    // Serial.print(*power);
-    // Serial.print(" pin: ");
-    // Serial.print(pin->pin1);
-    // Serial.print(" ");
-    // Serial.println(pin->pin2);
+    Serial.print(*power);
+    Serial.print(" pin: ");
+    Serial.print(pin->pin1);
+    Serial.print(" ");
+    Serial.println(pin->pin2);
 
     Motor_speed[pin->pin1 - 8] = *power;
     Motor_speed[pin->pin2 - 8] = 0;
 }
 
-void smooth_motor(int *left_motor, int *right_motor) {
-    left_power = motor_left_smooth.updateEstimate(*left_motor);
-    right_power = motor_right_smooth.updateEstimate(*right_motor);
-    // Serial.print(left_power);
-    // Serial.print(",");
-    // Serial.println(right_power);
-    setPWMMotors2(&left_power, &left_pin);
-    setPWMMotors2(&right_power, &right_pin);
-}
+// void smooth_motor(int *left_motor, int *right_motor) {
+//     left_power = motor_left_smooth.updateEstimate(*left_motor);
+//     right_power = motor_right_smooth.updateEstimate(*right_motor);
+//     // Serial.print(left_power);
+//     // Serial.print(",");
+//     // Serial.println(right_power);
+//     setPWMMotors2(&left_power, &left_pin);
+//     setPWMMotors2(&right_power, &right_pin);
+// }
 
 // tu tu roi lam :)
 void check_min_power() {
@@ -300,7 +287,7 @@ void check_min_power() {
     }
 }
 
-void motorPowerChange(bool is_lift, int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
+void motorPowerChangeImmediately(bool is_lift, int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
     // if (motorPower == 0) return;
     if (is_swap) swap(pin1, pin2);
 
@@ -312,27 +299,45 @@ void motorPowerChange(bool is_lift, int& motorPower, int pin1, int pin2, bool is
     setPWMMotors2(&motorPower, &pin);
 }
 
+void motorPowerChange(int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
+    // if (motorPower == 0) return;
+    if (is_swap) swap(pin1, pin2);
+
+    motorPower = motor_filter->updateEstimate(motorPower);
+
+    PIN pin = {pin1, pin2};
+
+    setPWMMotors2(&motorPower, &pin);
+}
+
+void turnWhenMove(){
+    if (abs(x_axis) != 1) return;
+    if (x_axis > 0) right_power = max(right_power - (left_power * TURN_RATIO[CURRENT_GEAR]) / 100, 0);
+    if (x_axis < 0) left_power = max(left_power - (right_power * TURN_RATIO[CURRENT_GEAR]) / 100, 0);
+}
+
 void motorControl() {
     using namespace ControlState;
-    motorPowerChange(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
-    motorPowerChange(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
+    // motorPowerChangeImmediately(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
+    // motorPowerChangeImmediately(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
 
+    if(y_axis == 1) left_power = right_power = POWER_LEVEL[CURRENT_GEAR];
+    else left_power = right_power = 0;
     switch (CURRENT_GEAR){
-        case 1:
-            // move but slowly, need calibrate by accelermeter. when rotate, one wheel will be lock
-        case 2:
-            // moving at medium speed. when roate, one wheel going to be faster than other 
-        case 3:
-            // moving at maximun speed (the max value user setting). when rotate, one wheel going to be slower than other
+        case 0:
+            // if(!x_axis)
+            motorPowerChangeImmediately(false, left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);
+            motorPowerChangeImmediately(false, right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
+            return;
         default:
-            motorPowerChange(false, 0, 8, 9, is_motor_left_reverse,  &motor_left_smooth);
-            motorPowerChange(false, 0, 10, 10, is_motor_right_reverse,  &motor_right_smooth);
-    }
+            turnWhenMove();
+            break;
+    };
+
+    motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);
+    motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
 }
 
 
-void move3(){ //hẹ hẹ hẹ
-
-}
 
 #endif
