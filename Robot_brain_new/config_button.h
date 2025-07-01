@@ -69,8 +69,8 @@ int MIN_POWER = 0;
 SimpleKalmanFilter joystick_x_filter(0.5, 0.01, 0.8);
 SimpleKalmanFilter joystick_y_filter(0.5, 0.01, 0.8);
 
-SimpleKalmanFilter motor_left_smooth(1, 1, 1);
-SimpleKalmanFilter motor_right_smooth(1, 1, 1);
+SimpleKalmanFilter motor_left_smooth(50, 0.1, 1);
+SimpleKalmanFilter motor_right_smooth(50, 0.1, 1);
 
 SimpleKalmanFilter motor_A_smooth(100, 1, 1);
 SimpleKalmanFilter motor_B_smooth(100, 1, 1);
@@ -103,8 +103,10 @@ namespace ControlState {
     bool is_reverse      = false;
     bool invert          = false; // reverse
     bool fast_stop       = false;
+    
     bool is_rotate_left  = false;
     bool is_rotate_right = false;
+
     bool is_motor_a      = false;
     bool is_motor_b      = false;
     bool is_motor_a_reverse = false;

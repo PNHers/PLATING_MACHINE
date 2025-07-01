@@ -77,7 +77,7 @@ void loop() {
     // get_accel();
     ps2x.read_gamepad();
 
-    // controlCollector(&pwm);
+    controlCollector(&pwm);
 
 
     positionOfJoystick(console_x_axis, console_y_axis);

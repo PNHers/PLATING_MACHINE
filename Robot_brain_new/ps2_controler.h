@@ -96,7 +96,7 @@ void consoleRead() {
         is_zero_force = true;
     }
 
-    if (ps2x.Button(REVERSE) && !is_reverse) {
+    if (ps2x.Button(REVERSE) && !is_reverse && !is_rotate_left && !is_rotate_right) {
         // instantSmoothBrake();
         fast_stop = true;
         CURRENT_GEAR = 0;

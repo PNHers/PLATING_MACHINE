@@ -69,16 +69,16 @@ void setServo180(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate_angle
     uint16_t pulse = (MAX_ROTATE - MIN_ROTATE) * rotate_angle / 180 + MIN_ROTATE;
     pwm->setPWM(channel, 0, 0);
     pwm->setPWM(channel, 0, pulse);
-    Serial.print("rotate collector arm at: ");
-    Serial.println(pulse);
+    // Serial.print("rotate collector arm at: ");
+    // Serial.println(pulse);
     pwm->setPWM(channel, 0, 0);
 }
 
 void setServo360(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate) {
     pwm->setPWM(channel, 0, 0);
     pwm->setPWM(channel, 0, rotate);
-    Serial.print("rotate collector at: ");
-    Serial.println(rotate);
+    // Serial.print("rotate collector at: ");
+    // Serial.println(rotate);
     delay(20);
     pwm->setPWM(channel, 0, 0);
 }
@@ -227,7 +227,6 @@ void setPWMMotors2(int *power, PIN *pin) {
     // int power_current2 = Motor_speed[pin->pin2];
     if (power_current1 * (*power) == 0 ) {
         
-
         if (Motor_speed[pin->pin2 - 8] != 0 && (*power) != 0){
             Serial.println("////////////////////////////// error set power wrong //////////////////////////////////////");
             // pwm.setPin(pin->pin1, 0);
@@ -241,11 +240,11 @@ void setPWMMotors2(int *power, PIN *pin) {
     pwm.setPin(pin->pin2, 0);
     // delay(50);
     
-    Serial.print(*power);
-    Serial.print(" pin: ");
-    Serial.print(pin->pin1);
-    Serial.print(" ");
-    Serial.println(pin->pin2);
+    // Serial.print(*power);
+    // Serial.print(" pin: ");
+    // Serial.print(pin->pin1);
+    // Serial.print(" ");
+    // Serial.println(pin->pin2);
 
     Motor_speed[pin->pin1 - 8] = *power;
     Motor_speed[pin->pin2 - 8] = 0;
@@ -318,21 +317,43 @@ void turnWhenMove(){
 
 void motorControl() {
     using namespace ControlState;
-    // motorPowerChangeImmediately(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
-    // motorPowerChangeImmediately(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
+    motorPowerChangeImmediately(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
+    motorPowerChangeImmediately(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
 
     if(y_axis == 1) left_power = right_power = POWER_LEVEL[CURRENT_GEAR];
     else left_power = right_power = 0;
+
+    if (is_rotate_left || is_rotate_right){
+        if (!right_power) is_rotate_right = false;
+        if (!left_power) is_rotate_left = false;
+    }
+
     switch (CURRENT_GEAR){
         case 0:
-            // if(!x_axis)
-            motorPowerChangeImmediately(false, left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);
-            motorPowerChangeImmediately(false, right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
+            if(abs(x_axis) == 1) break;
+            motorPowerChangeImmediately(false, left_power, 8, 9, is_rotate_left ? !is_motor_left_reverse : is_motor_left_reverse,  &motor_left_smooth);
+            motorPowerChangeImmediately(false, right_power, 10, 11, is_rotate_right ? !is_motor_right_reverse : is_motor_right_reverse,  &motor_right_smooth);
             return;
         default:
             turnWhenMove();
             break;
     };
+
+    if (left_power == right_power && left_power == 0){
+        if(abs(x_axis) == 1){
+            if(x_axis < 0){
+                right_power = 1024;
+                is_rotate_right = true;
+                motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
+            }
+            else if (x_axis > 0){
+                left_power = 1024;
+                is_rotate_left = true;
+                motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);   
+            }
+            return;
+        }
+    }
 
     motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);
     motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
