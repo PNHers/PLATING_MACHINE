@@ -66,6 +66,9 @@ int MIN_POWER = 0;
 #define TIME_SET_HOLD_FRUIT 600
 #define TIME_SET_COLLECTOR_CHANGE_SPEED 600
 
+#define BASKET_CONTROL_PIN 4
+#define BASKET_DEFAULT_ROTATION 90
+
 SimpleKalmanFilter joystick_x_filter(0.5, 0.01, 0.8);
 SimpleKalmanFilter joystick_y_filter(0.5, 0.01, 0.8);
 
