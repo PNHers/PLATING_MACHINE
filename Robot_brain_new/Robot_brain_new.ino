@@ -1,6 +1,5 @@
 #include "time_control.h"
 #include "RotateMotor.h"
-#include "ps2_controler.h"
 #include "gyro_control.h"
 #include "config_button.h"
 #include <SimpleKalmanFilter.h>
@@ -75,6 +74,8 @@ int time_base = 0;
 int time_play = 0;
 
 void loop() {
+    reset_motor();
+
     time_base = millis();
     
     using namespace ControlState;
@@ -125,11 +126,13 @@ void loop() {
     if (fast_stop && !current_power_left && !current_power_right) fast_stop = false;
     resetMotionState();
 
+    rotate_all_thing(&pwm);
+
 
     // if(detect_movement()) Serial.println("Object is moving!");
 
     delay(1);
     
-    time_play = millis() - time_base;
-    Serial.println(time_play);
+    // time_play = millis() - time_base;
+    // Serial.println(time_play);
 }

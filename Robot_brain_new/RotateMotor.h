@@ -8,6 +8,7 @@
 #include <Adafruit_PWMServoDriver.h>
 #include "config_button.h"
 #include "gyro_control.h"
+#include "ps2_controler.h"
 
 #define MENSURE_VAULE 0.05 // sai số khi joystick để ở vị trí ban đầu
 #define max_power 2025
@@ -19,6 +20,11 @@ using namespace ControlState;
 
 int MAX_LEVEL = MAX_GEAR + MAX_GEAR;
 bool already_pull = false, is_rotate = false;
+
+int rotate_motor[8] = {0,0,0,0,0,0,0,0};
+int Motor_speed[8] = {0,0,0 ,0 ,0 ,0 ,0 ,0};
+
+
 
 struct Rotate {
     int power;
@@ -75,44 +81,50 @@ void setServo180(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate_angle
 }
 
 void setServo360(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate) {
-    pwm->setPWM(channel, 0, 0);
+    // pwm->setPWM(channel, 0, 0);
     pwm->setPWM(channel, 0, rotate);
     // Serial.print("rotate collector at: ");
     // Serial.println(rotate);
-    delay(20);
-    pwm->setPWM(channel, 0, 0);
+    // delay(20);
+    // pwm->setPWM(channel, 0, 0);
 }
 
 //               pin :8,9,10,11,12,13,14,15
-int Motor_speed[8] = {0,0,0 ,0 ,0 ,0 ,0 ,0};
 
-void setPWMMotors2(int *power, PIN *pin) {
-    if (*power < 0 || *power > 4096) return;
-    int power_current1 = Motor_speed[pin->pin1 - 8];
+void setPWMMotors2(PIN *pin) {
+    int powerpin1 = rotate_motor[pin->pin1 - 8];
+    int power = (powerpin1 != 0)?powerpin1 : rotate_motor[pin->pin2 - 8];
+
+    int pin1 = (powerpin1 != 0)?pin->pin1 : pin->pin2;
+    int pin2 = (pin->pin1 + pin->pin2) - pin1;
+
+    if (power < 0 || power > 4096) return;
+    int power_current1 = Motor_speed[pin1 - 8];
     // int power_current2 = Motor_speed[pin->pin2];
-    if (power_current1 * (*power) == 0 ) {
+    if (power_current1 * (power) == 0 ) {
         
-        if (Motor_speed[pin->pin2 - 8] != 0 && (*power) != 0){
+        if (Motor_speed[pin2 - 8] != 0 && (power) != 0){
             Serial.println("////////////////////////////// error set power wrong //////////////////////////////////////");
             // pwm.setPin(pin->pin1, 0);
             // pwm.setPin(pin->pin2, 0);
             // delay(50);
-            *power = 0;
+            power = 0;
         }
     }
     
-    pwm.setPin(pin->pin1, *power);
-    pwm.setPin(pin->pin2, 0);
+    // pwm.setPin(pin->pin1, power);
+    // pwm.setPin(pin->pin2, 0);
     // delay(50);
     
-    // Serial.print(*power);
+    // Serial.print(power);
     // Serial.print(" pin: ");
     // Serial.print(pin->pin1);
     // Serial.print(" ");
     // Serial.println(pin->pin2);
 
-    Motor_speed[pin->pin1 - 8] = *power;
-    Motor_speed[pin->pin2 - 8] = 0;
+    Motor_speed[pin1 - 8] = power;
+    Motor_speed[pin2 - 8] = 0;
+    
 }
 
 // void smooth_motor(int *left_motor, int *right_motor) {
@@ -150,6 +162,7 @@ void check_min_power() {
         delay(1000);
     }
 }
+                // pin:8,9,10,11,12,13,14,15
 
 void motorPowerChangeImmediately(bool is_lift, int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
     // if (motorPower == 0) return;
@@ -158,9 +171,11 @@ void motorPowerChangeImmediately(bool is_lift, int& motorPower, int pin1, int pi
     motorPower = is_lift ? 4096 : 0;
     motorPower = motor_filter->updateEstimate(motorPower);
 
-    PIN pin = {pin1, pin2};
+    // PIN pin = {pin1, pin2};
 
-    setPWMMotors2(&motorPower, &pin);
+    // setPWMMotors2(&motorPower, &pin);
+    rotate_motor[pin1 - 8] = motorPower;
+    rotate_motor[pin2 - 8] = 0;
 }
 
 void motorPowerChange(int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
@@ -169,9 +184,11 @@ void motorPowerChange(int& motorPower, int pin1, int pin2, bool is_swap, SimpleK
 
     motorPower = motor_filter->updateEstimate(motorPower);
 
-    PIN pin = {pin1, pin2};
+    // PIN pin = {pin1, pin2};
 
-    setPWMMotors2(&motorPower, &pin);
+    // setPWMMotors2(&motorPower, &pin);
+    rotate_motor[pin1 - 8] = motorPower;
+    rotate_motor[pin2 - 8] = 0;
 }
 
 void turnWhenMove(){
@@ -225,6 +242,39 @@ void motorControl() {
     motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
 }
 
+void rotate_all_thing(Adafruit_PWMServoDriver *pwm){
+    // rotate servo
+    setServo360(pwm, COLLECTOR_PIN, collector_angle);
+    setServo180(pwm, COLLECTOR_ROTATION_PIN, collector_rotation_angle);
+
+    // rotation motor
+    // PIN pin = {pin1, pin2};
+
+    setPWMMotors2(new PIN(8,9));
+    setPWMMotors2(new PIN(10,11));
+    setPWMMotors2(new PIN(12,13));
+    setPWMMotors2(new PIN(14,15));
+
+    // Serial.print(rotate_motor[0]); Serial.print(" ");
+    // Serial.print(rotate_motor[1]); Serial.print(" ");
+    // Serial.print(rotate_motor[2]); Serial.print(" ");
+    // Serial.print(rotate_motor[3]); Serial.print(" ");
+    // Serial.print(rotate_motor[4]); Serial.print(" ");
+    // Serial.print(rotate_motor[5]); Serial.print(" ");
+    // Serial.print(rotate_motor[6]); Serial.print(" ");
+    // Serial.print(rotate_motor[7]); Serial.println(" ");
+}
+
+void reset_motor(){
+    rotate_motor[0] = 0;
+    rotate_motor[1] = 0;
+    rotate_motor[2] = 0;
+    rotate_motor[3] = 0;
+    rotate_motor[4] = 0;
+    rotate_motor[5] = 0;
+    rotate_motor[6] = 0;
+    rotate_motor[7] = 0;
+}
 
 
 #endif
