@@ -79,14 +79,14 @@ void consoleRead() {
     if (ps2x.Button(GEAR_UP) && !is_gear_up && !is_rotate_left && !is_rotate_right) {
         CURRENT_GEAR += 1;
         CURRENT_GEAR = min(CURRENT_GEAR, MAX_GEAR);
-        Serial.println(CURRENT_GEAR);
+        // Serial.println(CURRENT_GEAR);
         is_gear_up = true;
     }
 
     if (ps2x.Button(GEAR_DOWN) && !is_gear_down && !is_rotate_left && !is_rotate_right) {
         CURRENT_GEAR -= 1;
         CURRENT_GEAR = max(CURRENT_GEAR, 0);
-        Serial.println(CURRENT_GEAR);
+        // Serial.println(CURRENT_GEAR);
         is_gear_down = true;
     }
 
@@ -94,7 +94,7 @@ void consoleRead() {
         CURRENT_GEAR = 0;
         // instantSmoothBrake();
         fast_stop = true;
-        Serial.println(CURRENT_GEAR);
+        // Serial.println(CURRENT_GEAR);
         is_zero_force = true;
     }
 
@@ -103,7 +103,7 @@ void consoleRead() {
         fast_stop = true;
         CURRENT_GEAR = 0;
         invert = is_motor_right_reverse = is_motor_left_reverse = !invert;
-        Serial.println("reverse mode");
+        // Serial.println("reverse mode");
         is_reverse = true;
     }
 
@@ -144,7 +144,7 @@ void controlCollector(Adafruit_PWMServoDriver *pwm) {
 
         time_now_collector = millis();
 
-        if (time_now_collector - time_base_collector > TIME_SET_COLLECTOR_CHANGE_SPEED) {
+        if (time_now_collector - time_base_collector >= TIME_SET_COLLECTOR_CHANGE_SPEED) {
             collector_rotation_angle += (ps2x.Button(PSB_GREEN)) ? 1 : -1;
         }
     }
@@ -182,7 +182,7 @@ void controlCollector(Adafruit_PWMServoDriver *pwm) {
     }
 
     if (is_counting_press_time) {
-        if (millis() - time_base_hold_fruit > TIME_SET_COLLECTOR_CHANGE_SPEED) {
+        if (millis() - time_base_hold_fruit >= TIME_SET_COLLECTOR_CHANGE_SPEED) {
             is_counting_press_time = false;
             is_double_press = false;
         } else if (ps2x.Button(PSB_PINK)) {
@@ -196,6 +196,7 @@ void controlCollector(Adafruit_PWMServoDriver *pwm) {
     //control fruit basket
     if (ps2x.Button(PSB_SELECT)) is_start_fruit_basket = true;
     if (is_start_fruit_basket) setServo180(pwm, BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);
+    if (!ps2x.Button(PSB_SELECT)) is_start_fruit_basket = false;
 }
 
 #endif

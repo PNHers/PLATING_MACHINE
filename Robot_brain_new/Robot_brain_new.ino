@@ -66,7 +66,8 @@ void xTask0( void * pvParameters ){
         // calculateVelocity();
         // Serial.println(GyroSettings::velocity);
         // Serial.println(GyroSettings::accel_x);
-        delay(50);
+        controlCollector(&pwm);
+        delay(1);
     }
 }
 
@@ -77,7 +78,7 @@ void loop() {
     // get_accel();
     ps2x.read_gamepad();
 
-    controlCollector(&pwm);
+    // controlCollector(&pwm);
 
 
     positionOfJoystick(console_x_axis, console_y_axis);
@@ -123,5 +124,5 @@ void loop() {
 
     // if(detect_movement()) Serial.println("Object is moving!");
 
-    delay(20);
+    delay(1);
 }
