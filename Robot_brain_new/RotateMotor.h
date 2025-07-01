@@ -69,16 +69,16 @@ void setServo180(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate_angle
     uint16_t pulse = (MAX_ROTATE - MIN_ROTATE) * rotate_angle / 180 + MIN_ROTATE;
     pwm->setPWM(channel, 0, 0);
     pwm->setPWM(channel, 0, pulse);
-    Serial.print("rotate collector arm at: ");
-    Serial.println(pulse);
+    // Serial.print("rotate collector arm at: ");
+    // Serial.println(pulse);
     pwm->setPWM(channel, 0, 0);
 }
 
 void setServo360(Adafruit_PWMServoDriver *pwm, uint8_t channel, int rotate) {
     pwm->setPWM(channel, 0, 0);
     pwm->setPWM(channel, 0, rotate);
-    Serial.print("rotate collector at: ");
-    Serial.println(rotate);
+    // Serial.print("rotate collector at: ");
+    // Serial.println(rotate);
     delay(20);
     pwm->setPWM(channel, 0, 0);
 }

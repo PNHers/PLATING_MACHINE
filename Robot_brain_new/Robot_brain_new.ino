@@ -71,7 +71,11 @@ void xTask0( void * pvParameters ){
     }
 }
 
+int time_base = 0;
+int time_play = 0;
+
 void loop() {
+    time_base = millis();
     
     using namespace ControlState;
     // // tick_timer();
@@ -125,4 +129,7 @@ void loop() {
     // if(detect_movement()) Serial.println("Object is moving!");
 
     delay(1);
+    
+    time_play = millis() - time_base;
+    Serial.println(time_play);
 }
