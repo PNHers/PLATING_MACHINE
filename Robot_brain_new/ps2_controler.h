@@ -22,6 +22,8 @@ bool is_double_press = false;
 bool is_holding_collector_button = false;
 bool is_counting_press_time = false;
 
+bool is_start_fruit_basket = false;
+
 PS2X ps2x; // khởi tạo class PS2x
 
 void initPS2() {
@@ -190,6 +192,10 @@ void controlCollector(Adafruit_PWMServoDriver *pwm) {
     }
 
     setServo360(pwm, COLLECTOR_PIN, collector_angle);
+
+    //control fruit basket
+    if (ps2x.Button(PSB_SELECT)) is_start_fruit_basket = true;
+    if (is_start_fruit_basket) setServo180(pwm, BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);
 }
 
 #endif
