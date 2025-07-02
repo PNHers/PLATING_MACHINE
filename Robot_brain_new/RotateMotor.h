@@ -106,7 +106,7 @@ void setPWMMotors2(PIN *pin) {
 
     if (power < 0 || power > 4096) return;
     int power_current1 = Motor_speed[pin1 - 8];
-    // int power_current2 = Motor_speed[pin->pin2];
+    int power_current2 = Motor_speed[pin->pin2];
     if (power_current1 * (power) == 0 ) {
         
         if (Motor_speed[pin2 - 8] != 0 && (power) != 0){
@@ -179,11 +179,11 @@ void motorPowerChangeImmediately(bool is_lift, int& motorPower, int pin1, int pi
     motorPower = is_lift ? 4096 : 0;
     motorPower = motor_filter->updateEstimate(motorPower);
 
-    // PIN pin = {pin1, pin2};
+    PIN pin = {pin1, pin2};
 
-    // setPWMMotors2(&motorPower, &pin);
-    pwms[pin1] = motorPower;
-    pwms[pin2] = 0;
+    // setPWMMotors2(motorPower, &pin);
+    // pwms[pin1] = motorPower;
+    // pwms[pin2] = 0;
     rotate_motor[pin1 - 8] = motorPower;
     rotate_motor[pin2 - 8] = 0;
 }
@@ -194,11 +194,11 @@ void motorPowerChange(int& motorPower, int pin1, int pin2, bool is_swap, SimpleK
 
     motorPower = motor_filter->updateEstimate(motorPower);
 
-    // PIN pin = {pin1, pin2};
+    PIN pin = {pin1, pin2};
 
-    // setPWMMotors2(&motorPower, &pin);
-    pwms[pin1] = motorPower;
-    pwms[pin2] = 0;
+    // setPWMMotors2(motorPower, &pin);
+    // pwms[pin1] = motorPower;
+    // pwms[pin2] = 0;
     rotate_motor[pin1 - 8] = motorPower;
     rotate_motor[pin2 - 8] = 0;    
 }
@@ -254,28 +254,28 @@ void motorControl() {
     motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
 }
 
-// void rotate_all_thing(Adafruit_PWMServoDriver *pwm){
-//     // rotate servo
-//     setServo360(pwm, COLLECTOR_PIN, collector_angle);
-//     setServo180(pwm, COLLECTOR_ROTATION_PIN, collector_rotation_angle);
+void rotate_all_thing(){
+    // rotate servo
+    // setServo360(COLLECTOR_PIN, collector_angle);
+    // setServo180( COLLECTOR_ROTATION_PIN, collector_rotation_angle);
 
-//     // rotation motor
-//     // PIN pin = {pin1, pin2};
+    // rotation motor
+    // PIN pin = {pin1, pin2};
 
-//     setPWMMotors2(new PIN(8,9));
-//     setPWMMotors2(new PIN(10,11));
-//     setPWMMotors2(new PIN(12,13));
-//     setPWMMotors2(new PIN(14,15));
+    setPWMMotors2(new PIN(8,9));
+    setPWMMotors2(new PIN(10,11));
+    setPWMMotors2(new PIN(12,13));
+    setPWMMotors2(new PIN(14,15));
 
-//     // Serial.print(rotate_motor[0]); Serial.print(" ");
-//     // Serial.print(rotate_motor[1]); Serial.print(" ");
-//     // Serial.print(rotate_motor[2]); Serial.print(" ");
-//     // Serial.print(rotate_motor[3]); Serial.print(" ");
-//     // Serial.print(rotate_motor[4]); Serial.print(" ");
-//     // Serial.print(rotate_motor[5]); Serial.print(" ");
-//     // Serial.print(rotate_motor[6]); Serial.print(" ");
-//     // Serial.print(rotate_motor[7]); Serial.println(" ");
-// }
+    // Serial.print(rotate_motor[0]); Serial.print(" ");
+    // Serial.print(rotate_motor[1]); Serial.print(" ");
+    // Serial.print(rotate_motor[2]); Serial.print(" ");
+    // Serial.print(rotate_motor[3]); Serial.print(" ");
+    // Serial.print(rotate_motor[4]); Serial.print(" ");
+    // Serial.print(rotate_motor[5]); Serial.print(" ");
+    // Serial.print(rotate_motor[6]); Serial.print(" ");
+    // Serial.print(rotate_motor[7]); Serial.println(" ");
+}
 
 void reset_motor(){
     rotate_motor[0] = 0;

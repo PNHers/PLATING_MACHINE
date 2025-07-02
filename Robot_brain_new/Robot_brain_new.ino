@@ -37,7 +37,7 @@ void setup() {
     pwmController.resetDevices();       // Resets all PCA9685 devices on i2c line
     pwmController.init();               // Initializes module using default totem-pole driver mode, and default phase balancer
     pwmController.setPWMFrequency(50); // Set PWM freq to 500Hz (default is 200Hz, supports 24Hz to 1526Hz)
-    
+
     for(int i = 0; i < 16; i++) pwms[i] = 0;
     pwmController.setChannelsPWM(0, 16, pwms);
 
@@ -134,7 +134,7 @@ void loop() {
     if (fast_stop && !current_power_left && !current_power_right) fast_stop = false;
     resetMotionState();
 
-    // // rotate_all_thing(&pwm);
+    rotate_all_thing();
 
     // pwms[9] = 2048;
     // pwms[8] = 0;
@@ -149,7 +149,7 @@ void loop() {
 
     // // if(detect_movement()) Serial.println("Object is moving!");
 
-    delay(1);
+    delay(20);
     
     // time_play = millis() - time_base;
     // Serial.println(time_play);

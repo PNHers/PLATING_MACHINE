@@ -102,8 +102,10 @@ void consoleRead() {
 
     if (ps2x.Button(REVERSE) && !is_reverse && !is_rotate_left && !is_rotate_right) {
         // instantSmoothBrake();
+        motorPowerChangeImmediately(false, left_power, 8, 9, is_rotate_left ? !is_motor_left_reverse : is_motor_left_reverse,  &motor_left_smooth);
+        motorPowerChangeImmediately(false, right_power, 10, 11, is_rotate_right ? !is_motor_right_reverse : is_motor_right_reverse,  &motor_right_smooth);
         fast_stop = true;
-        CURRENT_GEAR = 0;
+        // CURRENT_GEAR = 0;
         invert = is_motor_right_reverse = is_motor_left_reverse = !invert;
         // Serial.println("reverse mode");
         is_reverse = true;
@@ -141,9 +143,14 @@ void consoleRead() {
 
 
 void controlCollector() {
+
+    if (ps2x.ButtonPressed(PSB_GREEN)) collector_rotation_angle += 1; 
+    else if (ps2x.ButtonPressed(PSB_BLUE)) collector_rotation_angle -= 1;
+    
     if (ps2x.Button(PSB_GREEN) || ps2x.Button(PSB_BLUE)) {
         if (!is_holding_collector_button) {
             time_base_collector = millis();
+            is_holding_collector_button = true;
         }
 
         time_now_collector = millis();
@@ -153,15 +160,8 @@ void controlCollector() {
         }
     }
 
-    if (ps2x.ButtonPressed(PSB_GREEN)) {
-        is_holding_collector_button = true;
-        collector_rotation_angle += 1;
-    } else if (ps2x.ButtonPressed(PSB_BLUE)) {
-        is_holding_collector_button = true;
-        collector_rotation_angle -= 1;
-    }
 
-    is_holding_collector_button = (ps2x.ButtonReleased(PSB_GREEN) || ps2x.ButtonReleased(PSB_BLUE)) ? false : is_holding_collector_button;
+    is_holding_collector_button = (!ps2x.Button(PSB_GREEN) && !ps2x.Button(PSB_BLUE)) ? false : is_holding_collector_button;
 
     collector_rotation_angle = min(collector_rotation_angle, 180);
     collector_rotation_angle = max(collector_rotation_angle, 0);
@@ -200,7 +200,10 @@ void controlCollector() {
     //control fruit basket
     if (ps2x.Button(PSB_SELECT)) is_start_fruit_basket = true;
     if (is_start_fruit_basket) setServo180( BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);
-    if (!ps2x.Button(PSB_SELECT)) is_start_fruit_basket = false;
+    if (!ps2x.Button(PSB_SELECT) && is_start_fruit_basket) {
+        pwms[BASKET_CONTROL_PIN] = 0;
+        is_start_fruit_basket = false;
+    }
 }
 
 #endif
