@@ -5,6 +5,7 @@
 #include <PS2X_lib.h> // Khai báo thư viện
 #include "HardwareSerial.h"
 #include "config_button.h"
+#include "RotateMotor.h"
 
 // Định nghĩa các chân điều khiển
 #define PS2_DAT 12 // MISO
@@ -139,7 +140,7 @@ void consoleRead() {
 
 
 
-void controlCollector(Adafruit_PWMServoDriver *pwm) {
+void controlCollector() {
     if (ps2x.Button(PSB_GREEN) || ps2x.Button(PSB_BLUE)) {
         if (!is_holding_collector_button) {
             time_base_collector = millis();
@@ -165,9 +166,9 @@ void controlCollector(Adafruit_PWMServoDriver *pwm) {
     collector_rotation_angle = min(collector_rotation_angle, 180);
     collector_rotation_angle = max(collector_rotation_angle, 0);
 
-    // setServo180(pwm, COLLECTOR_ROTATION_PIN, collector_rotation_angle);
+    setServo180( COLLECTOR_ROTATION_PIN, collector_rotation_angle);
 
-    collector_angle = 0;
+    int collector_angle = 0;
 
     if (ps2x.ButtonReleased(PSB_PINK)) {
         is_counting_press_time = true;
@@ -194,11 +195,11 @@ void controlCollector(Adafruit_PWMServoDriver *pwm) {
         }
     }
 
-    // setServo360(pwm, COLLECTOR_PIN, collector_angle);
+    setServo360( COLLECTOR_PIN, collector_angle);
 
     //control fruit basket
     if (ps2x.Button(PSB_SELECT)) is_start_fruit_basket = true;
-    
+    if (is_start_fruit_basket) setServo180( BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);
     if (!ps2x.Button(PSB_SELECT)) is_start_fruit_basket = false;
 }
 

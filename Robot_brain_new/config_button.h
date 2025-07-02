@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <SimpleKalmanFilter.h>
-#include <Adafruit_PWMServoDriver.h>
+// #include <Adafruit_PWMServoDriver.h>
+#include "PCA9685.h"
 
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+PCA9685 pwmController(B000000);  
+uint16_t pwms[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // CONSOLE
 
@@ -23,7 +25,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 #define IDLE 0.1 // stand
 
 int MIN_POWER = 0;
-#define MAX_POWER 2048
+#define MAX_POWER 2048 
 #define MAX_GEAR 3
 #define MAX_ROTATE_SPEED 3 // giá trị này phải bé hơn MAX_GEAR
 #define when_to_rotate 0.2 // khi nào robot nên xoay

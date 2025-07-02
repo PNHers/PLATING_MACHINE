@@ -3,12 +3,14 @@
 #include "gyro_control.h"
 #include "config_button.h"
 #include <SimpleKalmanFilter.h>
+#include "PCA9685.h"
+#include "ps2_controler.h"
 
 // Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 // int BASE_TIME = 0 , TIME = 0, NEW_TIME = 0, DEM = 0;
 
-TaskHandle_t Task0;
+// TaskHandle_t Task0;
 
 void checkStatus(float y_axis) {
     if (ControlState::invert) {
@@ -30,9 +32,15 @@ void setup() {
     Serial.println("Initializing systems...");
     delay(2000);
 
-    pwm.begin();
-    pwm.setOscillatorFrequency(27000000);
-    pwm.setPWMFreq(50);
+    Wire.begin();
+
+    pwmController.resetDevices();       // Resets all PCA9685 devices on i2c line
+    pwmController.init();               // Initializes module using default totem-pole driver mode, and default phase balancer
+    pwmController.setPWMFrequency(50); // Set PWM freq to 500Hz (default is 200Hz, supports 24Hz to 1526Hz)
+    
+    for(int i = 0; i < 16; i++) pwms[i] = 0;
+    pwmController.setChannelsPWM(0, 16, pwms);
+
     Wire.setClock(400000);
 
     initPS2();
@@ -47,28 +55,28 @@ void setup() {
     // Serial.println(myIMU.getGyroDataRate());
 
     GyroSettings::oldVelocityTime = millis();
-    xTaskCreatePinnedToCore(
-                xTask0,   /* Task function. */
-                "Gyroscope, accel & time",     /* name of task. */
-                10000,       /* Stack size of task */
-                NULL,        /* parameter of the task */
-                1,           /* priority of the task */
-                &Task0,      /* Task handle to keep track of created task */
-                0);          /* pin task to core 0 */   
+    // xTaskCreatePinnedToCore(
+    //             xTask0,   /* Task function. */
+    //             "Gyroscope, accel & time",     /* name of task. */
+    //             10000,       /* Stack size of task */
+    //             NULL,        /* parameter of the task */
+    //             1,           /* priority of the task */
+    //             &Task0,      /* Task handle to keep track of created task */
+    //             0);          /* pin task to core 0 */   
 
     Serial.println("Initialation success!");
 }
 
-void xTask0( void * pvParameters ){
-    while(true){
-        // get_accel();
-        // calculateVelocity();
-        // Serial.println(GyroSettings::velocity);
-        // Serial.println(GyroSettings::accel_x);
-        controlCollector(&pwm);
-        delay(1);
-    }
-}
+// void xTask0( void * pvParameters ){
+//     while(true){
+//         // get_accel();
+//         // calculateVelocity();
+//         // Serial.println(GyroSettings::velocity);
+//         // Serial.println(GyroSettings::accel_x);
+//         // controlCollector();
+//         delay(1);
+//     }
+// }
 
 int time_base = 0;
 int time_play = 0;
@@ -83,7 +91,7 @@ void loop() {
     // get_accel();
     ps2x.read_gamepad();
 
-    // controlCollector(&pwm);
+    controlCollector();
 
 
     positionOfJoystick(console_x_axis, console_y_axis);
@@ -126,10 +134,20 @@ void loop() {
     if (fast_stop && !current_power_left && !current_power_right) fast_stop = false;
     resetMotionState();
 
-    rotate_all_thing(&pwm);
+    // // rotate_all_thing(&pwm);
+
+    // pwms[9] = 2048;
+    // pwms[8] = 0;
+    safety_check();
+    // for(uint16_t i : pwms){
+    //     Serial.print(i);
+    //     Serial.print(", ");
+    // }
+    // Serial.println("");
+    pwmController.setChannelsPWM(0, 16, pwms);
 
 
-    // if(detect_movement()) Serial.println("Object is moving!");
+    // // if(detect_movement()) Serial.println("Object is moving!");
 
     delay(1);
     
