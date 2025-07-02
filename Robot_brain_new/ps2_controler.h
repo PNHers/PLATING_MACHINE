@@ -42,18 +42,10 @@ void initPS2() {
 }
 
 void positionOfJoystick(float &x_axis, float &y_axis) {
-    ps2x.read_gamepad(); // gọi hàm để đọc tay điều khiển
     const float HANDLED_PSX = (ps2x.Analog(PSS_RX) - 127.5) / 127.5;
     const float HANDLED_PSY = (ps2x.Analog(PSS_LY) - 127.5) / 127.5;
     x_axis = HANDLED_PSX;
     y_axis = -HANDLED_PSY;
-}
-
-void smoothenJoystick() {
-    // x_axis = joystick_x_filter.updateEstimate(console_x_axis);
-    x_axis = console_x_axis;
-    // y_axis = joystick_y_filter.updateEstimate(console_y_axis);
-    y_axis = console_y_axis;
 }
 
 void resetMotionState() {
@@ -81,33 +73,26 @@ void consoleRead() {
     if (ps2x.Button(GEAR_UP) && !is_gear_up && !is_rotate_left && !is_rotate_right) {
         CURRENT_GEAR += 1;
         CURRENT_GEAR = min(CURRENT_GEAR, MAX_GEAR);
-        // Serial.println(CURRENT_GEAR);
         is_gear_up = true;
     }
 
     if (ps2x.Button(GEAR_DOWN) && !is_gear_down && !is_rotate_left && !is_rotate_right) {
         CURRENT_GEAR -= 1;
         CURRENT_GEAR = max(CURRENT_GEAR, 0);
-        // Serial.println(CURRENT_GEAR);
         is_gear_down = true;
     }
 
     if (ps2x.Button(ZERO_FORCE) && !is_zero_force) {
         CURRENT_GEAR = 0;
-        // instantSmoothBrake();
         fast_stop = true;
-        // Serial.println(CURRENT_GEAR);
         is_zero_force = true;
     }
 
     if (ps2x.Button(REVERSE) && !is_reverse && !is_rotate_left && !is_rotate_right) {
-        // instantSmoothBrake();
         motorPowerChangeImmediately(false, left_power, 8, 9, is_rotate_left ? !is_motor_left_reverse : is_motor_left_reverse,  &motor_left_smooth);
         motorPowerChangeImmediately(false, right_power, 10, 11, is_rotate_right ? !is_motor_right_reverse : is_motor_right_reverse,  &motor_right_smooth);
         fast_stop = true;
-        // CURRENT_GEAR = 0;
         invert = is_motor_right_reverse = is_motor_left_reverse = !invert;
-        // Serial.println("reverse mode");
         is_reverse = true;
     }
 
@@ -139,8 +124,6 @@ void consoleRead() {
         is_motor_right = false;
     }
 }
-
-
 
 void controlCollector() {
 
@@ -197,7 +180,7 @@ void controlCollector() {
 
     setServo360( COLLECTOR_PIN, collector_angle);
 
-    //control fruit basket
+    // control fruit basket
     if (ps2x.Button(PSB_SELECT)) is_start_fruit_basket = true;
     if (is_start_fruit_basket) setServo180( BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);
     if (!ps2x.Button(PSB_SELECT) && is_start_fruit_basket) {

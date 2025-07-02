@@ -5,17 +5,13 @@
 #include <vector>
 
 #include <Wire.h>
-// #include <Adafruit_PWMServoDriver.h>
 #include "config_button.h"
-#include "gyro_control.h"
 
 #include "PCA9685.h"
 
 #define MENSURE_VAULE 0.05 // sai số khi joystick để ở vị trí ban đầu
 #define max_power 2025
 #define STEP 100
-
-// Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 using namespace ControlState;
 
@@ -27,8 +23,6 @@ bool already_pull = false, is_rotate = false;
 
 int rotate_motor[8] = {0,0,0,0,0,0,0,0};
 int Motor_speed[8] = {0,0,0 ,0 ,0 ,0 ,0 ,0};
-
-
 
 struct Rotate {
     int power;
@@ -52,50 +46,18 @@ void Div_level() {
 
     POWER_LEVEL[MAX_GEAR] = MAX_POWER;
     POWER_LEVEL[0] = 0;
-
-    power_lift = temp / 2;
-    self_rotate_gap = (MAX_POWER - MIN_POWER) * (SELF_ROTATE_RATIO / 100.0);
 }
-
-void smooth_motor(int *left_motor, int *right_motor);
 
 // anh dung dep trai
-// void setPWMMotors(Rotate motor_info, Adafruit_PWMServoDriver *pwm) {
-//     if (motor_info.power < 0)
-//         return;
-
-//     pwm->setPin(motor_info.pin1, motor_info.power);
-//     pwm->setPin(motor_info.pin2, 0);
-//     delay(50);
-//     Serial.print(motor_info.power);
-//     Serial.print(" pin: ");
-//     Serial.print(motor_info.pin1);
-//     Serial.print(" ");
-//     Serial.println(motor_info.pin2);
-// }
 
 void setServo180( uint8_t channel, int rotate_angle) {
-    // float handled_angle = (rotate_angle - MIN_ANGLE_DEFAULT)/ (MAX_ANGLE_DEFAULT - MIN_ANGLE_DEFAULT);
     uint16_t pulse = (MAX_ROTATE - MIN_ROTATE) * rotate_angle / 180 + MIN_ROTATE;
-    // pwm->setPWM(channel, 0, 0);
-    // pwm->setPWM(channel, 0, pulse)
     pwms[channel] = pulse;
-    // Serial.print("rotate collector arm at: ");
-    // Serial.println(pulse);
-    // pwm->setPWM(channel, 0, 0);
 }
 
-void setServo360( uint8_t channel, int rotate) {
-    // pwm->setPWM(channel, 0, 0);
-    // pwm->setPWM(channel, 0, rotate);
+void setServo360(uint8_t channel, int rotate) {
     pwms[channel] = rotate;
-    // Serial.print("rotate collector at: ");
-    // Serial.println(rotate);
-    // delay(20);
-    // pwm->setPWM(channel, 0, 0);
 }
-
-//               pin :8,9,10,11,12,13,14,15
 
 void setPWMMotors2(PIN *pin) {
     int powerpin1 = rotate_motor[pin->pin1 - 8];
@@ -111,16 +73,9 @@ void setPWMMotors2(PIN *pin) {
         
         if (Motor_speed[pin2 - 8] != 0 && (power) != 0){
             Serial.println("////////////////////////////// error set power wrong //////////////////////////////////////");
-            // pwm.setPin(pin->pin1, 0);
-            // pwm.setPin(pin->pin2, 0);
-            // delay(50);
             power = 0;
         }
     }
-    
-    // pwm.setPin(pin->pin1, power);
-    // pwm.setPin(pin->pin2, 0);
-    // delay(50);
     
     // Serial.print(power);
     // Serial.print(" pin: ");
@@ -135,45 +90,7 @@ void setPWMMotors2(PIN *pin) {
     
 }
 
-// void smooth_motor(int *left_motor, int *right_motor) {
-//     left_power = motor_left_smooth.updateEstimate(*left_motor);
-//     right_power = motor_right_smooth.updateEstimate(*right_motor);
-//     // Serial.print(left_power);
-//     // Serial.print(",");
-//     // Serial.println(right_power);
-//     setPWMMotors2(&left_power, &left_pin);
-//     setPWMMotors2(&right_power, &right_pin);
-// }
-
-// tu tu roi lam :)
-void check_min_power() {
-    Serial.println("checking min power");
-    delay(1000);
-
-    for (auto const &min_value : MIN_VALUE) {
-        Serial.print("Testing ");
-        Serial.println(min_value);
-        delay(500);
-
-        // chay motor
-        if (isRobotMoving())
-        {
-            MIN_POWER = min_value;
-            // dung motor
-            break;
-        }
-        else
-        {
-            // dung motor
-        }
-
-        delay(1000);
-    }
-}
-                // pin:8,9,10,11,12,13,14,15
-
 void motorPowerChangeImmediately(bool is_lift, int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
-    // if (motorPower == 0) return;
     if (is_swap) swap(pin1, pin2);
 
     motorPower = is_lift ? 4096 : 0;
@@ -181,24 +98,17 @@ void motorPowerChangeImmediately(bool is_lift, int& motorPower, int pin1, int pi
 
     PIN pin = {pin1, pin2};
 
-    // setPWMMotors2(motorPower, &pin);
-    // pwms[pin1] = motorPower;
-    // pwms[pin2] = 0;
     rotate_motor[pin1 - 8] = motorPower;
     rotate_motor[pin2 - 8] = 0;
 }
 
 void motorPowerChange(int& motorPower, int pin1, int pin2, bool is_swap, SimpleKalmanFilter* motor_filter){
-    // if (motorPower == 0) return;
     if (is_swap) swap(pin1, pin2);
 
     motorPower = motor_filter->updateEstimate(motorPower);
 
     PIN pin = {pin1, pin2};
 
-    // setPWMMotors2(motorPower, &pin);
-    // pwms[pin1] = motorPower;
-    // pwms[pin2] = 0;
     rotate_motor[pin1 - 8] = motorPower;
     rotate_motor[pin2 - 8] = 0;    
 }
@@ -254,27 +164,11 @@ void motorControl() {
     motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
 }
 
-void rotate_all_thing(){
-    // rotate servo
-    // setServo360(COLLECTOR_PIN, collector_angle);
-    // setServo180( COLLECTOR_ROTATION_PIN, collector_rotation_angle);
-
-    // rotation motor
-    // PIN pin = {pin1, pin2};
-
+void rotate_all_thing() {
     setPWMMotors2(new PIN(8,9));
     setPWMMotors2(new PIN(10,11));
     setPWMMotors2(new PIN(12,13));
     setPWMMotors2(new PIN(14,15));
-
-    // Serial.print(rotate_motor[0]); Serial.print(" ");
-    // Serial.print(rotate_motor[1]); Serial.print(" ");
-    // Serial.print(rotate_motor[2]); Serial.print(" ");
-    // Serial.print(rotate_motor[3]); Serial.print(" ");
-    // Serial.print(rotate_motor[4]); Serial.print(" ");
-    // Serial.print(rotate_motor[5]); Serial.print(" ");
-    // Serial.print(rotate_motor[6]); Serial.print(" ");
-    // Serial.print(rotate_motor[7]); Serial.println(" ");
 }
 
 void reset_motor(){
@@ -289,10 +183,10 @@ void reset_motor(){
 }
 
 void safety_check(){
-    if(pwms[8] * pwms[9] != 0) pwms[8] = pwms[9] = 0;
-    if(pwms[10] * pwms[11] != 0) pwms[10] = pwms[11] = 0;
-    if(pwms[12] * pwms[13] != 0) pwms[12] = pwms[13] = 0;
-    if(pwms[14] * pwms[15] != 0) pwms[14] = pwms[15] = 0;
+    if (pwms[8] * pwms[9] != 0) pwms[8] = pwms[9] = 0;
+    if (pwms[10] * pwms[11] != 0) pwms[10] = pwms[11] = 0;
+    if (pwms[12] * pwms[13] != 0) pwms[12] = pwms[13] = 0;
+    if (pwms[14] * pwms[15] != 0) pwms[14] = pwms[15] = 0;
 }
 
 
