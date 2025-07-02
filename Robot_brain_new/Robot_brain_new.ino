@@ -90,6 +90,7 @@ void loop() {
     // // tick_timer();
     // get_accel();
     ps2x.read_gamepad();
+    delay(10);
 
     controlCollector();
 
@@ -134,7 +135,7 @@ void loop() {
     if (fast_stop && !current_power_left && !current_power_right) fast_stop = false;
     resetMotionState();
 
-    rotate_all_thing();
+    // rotate_all_thing();
 
     // pwms[9] = 2048;
     // pwms[8] = 0;
@@ -149,7 +150,7 @@ void loop() {
 
     // // if(detect_movement()) Serial.println("Object is moving!");
 
-    delay(20);
+    delay(10);
     
     // time_play = millis() - time_base;
     // Serial.println(time_play);
