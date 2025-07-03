@@ -115,8 +115,8 @@ void motorPowerChange(int& motorPower, int pin1, int pin2, bool is_swap, SimpleK
 
 void turnWhenMove(){
     if (abs(x_axis) != 1) return;
-    if (x_axis > 0) right_power = max(right_power - (left_power * TURN_RATIO[CURRENT_GEAR]) / 100, 0);
-    if (x_axis < 0) left_power = max(left_power - (right_power * TURN_RATIO[CURRENT_GEAR]) / 100, 0);
+    if (x_axis > 0) right_power = CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
+    if (x_axis < 0) left_power = CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
 }
 
 void motorControl() {
