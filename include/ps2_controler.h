@@ -27,6 +27,7 @@ bool is_holding_collector_button = false;
 bool is_counting_press_time = false;
 
 bool is_start_fruit_basket = false;
+bool is_high_basket = false;
 
 PS2X ps2x; // khởi tạo class PS2x
 
@@ -184,11 +185,19 @@ void controlCollector() {
 
     // control fruit basket
     if (ps2x.Button(PSB_SELECT)) is_start_fruit_basket = true;
-    if (is_start_fruit_basket) setServo180( BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);
     if (!ps2x.Button(PSB_SELECT) && is_start_fruit_basket) {
         pwms[BASKET_CONTROL_PIN] = 0;
         is_start_fruit_basket = false;
     }
+    
+    if (ps2x.Button(PSB_START)) is_high_basket = true;
+    if (!ps2x.Button(PSB_START) && is_high_basket) {
+        pwms[BASKET_CONTROL_PIN] = 0;
+        is_high_basket = false;
+    }
+
+    if (is_high_basket) {setServo180( BASKET_CONTROL_PIN, BASKET_HIGH_DEFAULT_ROTATION);}
+    else if (is_start_fruit_basket) {setServo180( BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);}
 }
 
 #endif

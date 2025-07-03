@@ -29,7 +29,7 @@ int MIN_POWER = 0;
 #define MIN_ROTATE 80
 #define MAX_ROTATE 570
 
-#define DEFAULT_ANGLE 540
+#define DEFAULT_ANGLE 170
 #define MIN_ANGLE_DEFAULT 0
 #define MAX_ANGLE_DEFAULT 180
 #define COLLECTOR_PIN 3
@@ -42,7 +42,8 @@ int MIN_POWER = 0;
 #define TIME_SET_COLLECTOR_CHANGE_SPEED 600
 
 #define BASKET_CONTROL_PIN 4
-#define BASKET_DEFAULT_ROTATION 135
+#define BASKET_DEFAULT_ROTATION  120
+#define BASKET_HIGH_DEFAULT_ROTATION 50
 
 SimpleKalmanFilter motor_left_smooth(50, 0.1, 1);
 SimpleKalmanFilter motor_right_smooth(50, 0.1, 1);
