@@ -44,7 +44,7 @@ void loop() {
 
     ps2x.read_gamepad();
 
-    if (millis() - time_base_run > 20){
+    // if (millis() - time_base_run > 1){
         reset_motor();
         time_base = millis();
 
@@ -57,17 +57,21 @@ void loop() {
         y_axis = console_y_axis;
 
         consoleRead();
-
+        if (fast_stop && !left_power && !right_power) fast_stop = false;
         motorControl();
-
-        if (fast_stop) fast_stop = false;
-        resetMotionState();
-
+        
         rotate_all_thing();
-
         safety_check();
+        resetMotionState();
+        
+        // for(uint16_t i : pwms){
+        //     Serial.print(i);
+        //     Serial.print(", ");
+        // }
+        // Serial.println("");
 
         pwmController.setChannelsPWM(0, 16, pwms);
-    }
+        delay(10);
+    // }
 
 }

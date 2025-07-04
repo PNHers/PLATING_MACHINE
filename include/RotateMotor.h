@@ -39,13 +39,16 @@ void swap(int &a, int &b) {
 
 // lưu các giá trị vào ma trận
 void Div_level() {
-    int temp = (MAX_POWER - MIN_POWER) / MAX_GEAR;
-    POWER_LEVEL[0] = MIN_POWER;
+    // int temp = (MAX_POWER - MIN_POWER) / MAX_GEAR;
+    // POWER_LEVEL[0] = MIN_POWER;
 
-    for (int i = 1; i <= MAX_GEAR; i++) POWER_LEVEL[i] = POWER_LEVEL[i - 1] + temp;
+    // for (int i = 1; i <= MAX_GEAR; i++) POWER_LEVEL[i] = POWER_LEVEL[i - 1] + temp;
 
-    POWER_LEVEL[MAX_GEAR] = MAX_POWER;
-    POWER_LEVEL[0] = 0;
+    // POWER_LEVEL[MAX_GEAR] = MAX_POWER;
+    // POWER_LEVEL[0] = 0;
+    POWER_LEVEL[1] = 825;
+    POWER_LEVEL[2] = 1450;
+    POWER_LEVEL[3] = 1890; 
 }
 
 // anh dung dep trai
@@ -117,13 +120,15 @@ void motorPowerChange(int& motorPower, int pin1, int pin2, bool is_swap, SimpleK
 }
 
 void turnWhenMove(){
-
     if (abs(x_axis) != 1) return;
-    if (x_axis > 0) right_power = CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
-    if (x_axis < 0) left_power = CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
+    // if (x_axis > 0) right_power = max(right_power - (left_power * TURN_RATIO[CURRENT_GEAR]) / 100, 0);
+    // if (x_axis < 0) left_power = max(left_power - (right_power * TURN_RATIO[CURRENT_GEAR]) / 100, 0);
+    if (x_axis > 0) right_power = 0;
+    if (x_axis < 0) left_power = 0;
 }
 
 void motorControl() {
+    if (invert) x_axis *= -1;
     using namespace ControlState;
     motorPowerChangeImmediately(is_motor_a, motor_power_A, 12, 13, is_motor_a_reverse,  &motor_A_smooth);
     motorPowerChangeImmediately(is_motor_b, motor_power_B, 14, 15, is_motor_b_reverse,  &motor_B_smooth);
@@ -148,15 +153,14 @@ void motorControl() {
     };
 
     if (left_power == right_power && left_power == 0){
-        if (invert) x_axis *= -1; 
         if(abs(x_axis) == 1){
             if(x_axis < 0){
-                right_power = 1024;
+                right_power = CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
                 is_rotate_right = true;
                 motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
             }
             else if (x_axis > 0){
-                left_power = 1024;
+                left_power =  CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
                 is_rotate_left = true;
                 motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);   
             }

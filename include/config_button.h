@@ -13,15 +13,15 @@ uint16_t pwms[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 // CONSOLE
 
-#define GEAR_UP PSB_L2
-#define GEAR_DOWN PSB_L1
+#define GEAR_UP PSB_PAD_UP
+#define GEAR_DOWN PSB_PAD_DOWN
 #define ZERO_FORCE PSB_L3
 #define REVERSE PSB_R3 
 
 // MOTOR SETTING
 
 int MIN_POWER = 0;
-#define MAX_POWER 2048 
+#define MAX_POWER 2560
 #define MAX_GEAR 3
 
 // SERVO SETTING
@@ -97,6 +97,6 @@ float x_axis = 0, y_axis = 0;
 int left_power = 0, right_power = 0;
 
 std::vector<int> POWER_LEVEL(MAX_GEAR, 0);    // lưu mức năng lượng
-std::array<int, 4> TURN_RATIO = { 0 , 50, 40, 30 };
+std::array<int, 4> TURN_RATIO = { 0 , 50, 60, 70 };
 
 #endif
