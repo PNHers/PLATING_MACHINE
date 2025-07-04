@@ -64,7 +64,7 @@ void resetMotionState() {
     }
     if (!motor_power_A) is_motor_a_reverse = false;
 
-    if (!ps2x.Button(PSB_PAD_UP) && !ps2x.Button(PSB_PAD_DOWN)) {
+    if (!ps2x.Button(PSB_L2) && !ps2x.Button(PSB_L1)) {
         is_motor_b = false;
     }
     if (!motor_power_B) is_motor_b_reverse = false;
@@ -99,11 +99,11 @@ void consoleRead() {
         is_reverse = true;
     }
 
-    if (ps2x.Button(PSB_R2) && !is_motor_a && !motor_power_A){
+    if (ps2x.Button(PSB_R1) && !is_motor_a && !motor_power_A){
         is_motor_a = true;
     }
 
-    if (ps2x.Button(PSB_R1) && !is_motor_a && !motor_power_A){
+    if (ps2x.Button(PSB_R2) && !is_motor_a && !motor_power_A){
         is_motor_a = true;
         is_motor_a_reverse = true;
     }
