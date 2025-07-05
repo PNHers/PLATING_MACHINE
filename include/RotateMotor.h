@@ -46,9 +46,11 @@ void Div_level() {
 
     // POWER_LEVEL[MAX_GEAR] = MAX_POWER;
     // POWER_LEVEL[0] = 0;
-    POWER_LEVEL[1] = 825;
-    POWER_LEVEL[2] = 1450;
-    POWER_LEVEL[3] = 1890; 
+    POWER_LEVEL[1] = 900;
+    POWER_LEVEL[2] = 975;
+    POWER_LEVEL[3] = 1200; 
+    POWER_LEVEL[4] = 1890; 
+    POWER_LEVEL[5] = 2048; 
 }
 
 // anh dung dep trai
@@ -147,23 +149,25 @@ void motorControl() {
             motorPowerChangeImmediately(false, left_power, 8, 9, is_rotate_left ? !is_motor_left_reverse : is_motor_left_reverse,  &motor_left_smooth);
             motorPowerChangeImmediately(false, right_power, 10, 11, is_rotate_right ? !is_motor_right_reverse : is_motor_right_reverse,  &motor_right_smooth);
             return;
-        default:
+            default:
             turnWhenMove();
             break;
-    };
-
-    if (left_power == right_power && left_power == 0){
-        if(abs(x_axis) == 1){
-            if(x_axis < 0){
-                right_power = CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
-                is_rotate_right = true;
-                motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
-            }
-            else if (x_axis > 0){
-                left_power =  CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
-                is_rotate_left = true;
-                motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);   
-            }
+        };
+        
+        if (left_power == right_power && left_power == 0){
+            if(abs(x_axis) == 1){
+                if(x_axis < 0){
+                    right_power = CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
+                    is_rotate_right = true;
+                    motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
+                    motorPowerChangeImmediately(false, left_power, 8, 9, is_rotate_left ? !is_motor_left_reverse : is_motor_left_reverse,  &motor_left_smooth);
+                }
+                else if (x_axis > 0){
+                    left_power =  CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
+                    is_rotate_left = true;
+                    motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);   
+                    motorPowerChangeImmediately(false, right_power, 10, 11, is_rotate_right ? !is_motor_right_reverse : is_motor_right_reverse,  &motor_right_smooth);
+                }
             return;
         }
     }

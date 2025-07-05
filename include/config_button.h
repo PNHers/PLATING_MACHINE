@@ -22,7 +22,7 @@ uint16_t pwms[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 int MIN_POWER = 0;
 #define MAX_POWER 2560
-#define MAX_GEAR 3
+#define MAX_GEAR 5
 
 // SERVO SETTING
 
@@ -45,8 +45,8 @@ int MIN_POWER = 0;
 #define BASKET_DEFAULT_ROTATION  120
 #define BASKET_HIGH_DEFAULT_ROTATION 50
 
-SimpleKalmanFilter motor_left_smooth(50, 0.1, 1);
-SimpleKalmanFilter motor_right_smooth(50, 0.1, 1);
+SimpleKalmanFilter motor_left_smooth(50, 0.1, 0.5);
+SimpleKalmanFilter motor_right_smooth(50, 0.1, 0.5);
 
 SimpleKalmanFilter motor_A_smooth(100, 1, 1);
 SimpleKalmanFilter motor_B_smooth(100, 1, 1);
@@ -89,8 +89,6 @@ namespace ControlState {
 
 int CURRENT_GEAR = 0;
 int motor_power_A = 0, motor_power_B = 0;
-
-std::array<int, 4> MIN_VALUE = {128, 256, 512, 1024};
 
 float console_x_axis = 0, console_y_axis = 0;
 float x_axis = 0, y_axis = 0;

@@ -64,11 +64,11 @@ void loop() {
         safety_check();
         resetMotionState();
         
-        // for(uint16_t i : pwms){
-        //     Serial.print(i);
-        //     Serial.print(", ");
-        // }
-        // Serial.println("");
+        for(uint16_t i : pwms){
+            Serial.print(i);
+            Serial.print(", ");
+        }
+        Serial.println("");
 
         pwmController.setChannelsPWM(0, 16, pwms);
         delay(10);

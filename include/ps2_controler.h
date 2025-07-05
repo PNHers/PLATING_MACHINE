@@ -49,6 +49,17 @@ void positionOfJoystick(float &x_axis, float &y_axis) {
     const float HANDLED_PSY = (ps2x.Analog(PSS_LY) - 127.5) / 127.5;
     x_axis = HANDLED_PSX;
     y_axis = -HANDLED_PSY;
+    
+    if(abs(y_axis) == 1){
+        motor_left_smooth.setProcessNoise(0.1);
+        motor_right_smooth.setProcessNoise(0.1);
+    }
+    else
+    {
+        motor_left_smooth.setProcessNoise(10);
+        motor_right_smooth.setProcessNoise(10);
+        
+    }  
 }
 
 void resetMotionState() {
