@@ -51,8 +51,8 @@ void Div_level() {
     // POWER_LEVEL[3] = 1200; 
     // POWER_LEVEL[4] = 1890; 
     // POWER_LEVEL[5] = 2048; 
-    POWER_LEVEL[1] = 1450;
-    POWER_LEVEL[2] = 1550;
+    POWER_LEVEL[1] = 1350;
+    POWER_LEVEL[2] = 1450;
     POWER_LEVEL[3] = 2000; 
     POWER_LEVEL[4] = 2300; 
     POWER_LEVEL[5] = 2500; 
