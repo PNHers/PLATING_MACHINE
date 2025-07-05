@@ -23,6 +23,7 @@ uint16_t pwms[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 int MIN_POWER = 0;
 #define MAX_POWER 2560
 #define MAX_GEAR 5
+int LEFT_MESURE = 250;
 
 // SERVO SETTING
 
@@ -45,8 +46,8 @@ int MIN_POWER = 0;
 #define BASKET_DEFAULT_ROTATION  120
 #define BASKET_HIGH_DEFAULT_ROTATION 50
 
-SimpleKalmanFilter motor_left_smooth(50, 0.1, 0.5);
-SimpleKalmanFilter motor_right_smooth(50, 0.1, 0.5);
+SimpleKalmanFilter motor_left_smooth(100, 0.1, 0.5);
+SimpleKalmanFilter motor_right_smooth(100, 0.1, 0.5);
 
 SimpleKalmanFilter motor_A_smooth(100, 1, 1);
 SimpleKalmanFilter motor_B_smooth(100, 1, 1);
@@ -85,6 +86,8 @@ namespace ControlState {
     bool is_motor_right  = false;
     bool is_motor_left_reverse = false;
     bool is_motor_right_reverse = false;
+
+    bool is_basket_hold = false;
 }
 
 int CURRENT_GEAR = 0;

@@ -51,8 +51,8 @@ void positionOfJoystick(float &x_axis, float &y_axis) {
     y_axis = -HANDLED_PSY;
     
     if(abs(y_axis) == 1){
-        motor_left_smooth.setProcessNoise(0.1);
-        motor_right_smooth.setProcessNoise(0.1);
+        motor_left_smooth.setProcessNoise(0.07);
+        motor_right_smooth.setProcessNoise(0.07);
     }
     else
     {
@@ -201,11 +201,17 @@ void controlCollector() {
         is_start_fruit_basket = false;
     }
     
-    if (ps2x.Button(PSB_START)) is_high_basket = true;
-    if (!ps2x.Button(PSB_START) && is_high_basket) {
-        pwms[BASKET_CONTROL_PIN] = 0;
-        is_high_basket = false;
+    if (ps2x.ButtonPressed(PSB_START)) {
+        if (is_high_basket) {
+            pwms[BASKET_CONTROL_PIN] = 0;
+            is_high_basket = false;
+        }
+        else is_high_basket = true;
     }
+    // if (!ps2x.Button(PSB_START) && is_high_basket) {
+    //     pwms[BASKET_CONTROL_PIN] = 0;
+    //     is_high_basket = false;
+    // }
 
     if (is_high_basket) {setServo180( BASKET_CONTROL_PIN, BASKET_HIGH_DEFAULT_ROTATION);}
     else if (is_start_fruit_basket) {setServo180( BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);}

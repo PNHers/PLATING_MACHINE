@@ -46,11 +46,16 @@ void Div_level() {
 
     // POWER_LEVEL[MAX_GEAR] = MAX_POWER;
     // POWER_LEVEL[0] = 0;
-    POWER_LEVEL[1] = 900;
-    POWER_LEVEL[2] = 975;
-    POWER_LEVEL[3] = 1200; 
-    POWER_LEVEL[4] = 1890; 
-    POWER_LEVEL[5] = 2048; 
+    // POWER_LEVEL[1] = 900;
+    // POWER_LEVEL[2] = 975;
+    // POWER_LEVEL[3] = 1200; 
+    // POWER_LEVEL[4] = 1890; 
+    // POWER_LEVEL[5] = 2048; 
+    POWER_LEVEL[1] = 1450;
+    POWER_LEVEL[2] = 1550;
+    POWER_LEVEL[3] = 2000; 
+    POWER_LEVEL[4] = 2300; 
+    POWER_LEVEL[5] = 2500; 
 }
 
 // anh dung dep trai
@@ -149,7 +154,7 @@ void motorControl() {
             motorPowerChangeImmediately(false, left_power, 8, 9, is_rotate_left ? !is_motor_left_reverse : is_motor_left_reverse,  &motor_left_smooth);
             motorPowerChangeImmediately(false, right_power, 10, 11, is_rotate_right ? !is_motor_right_reverse : is_motor_right_reverse,  &motor_right_smooth);
             return;
-            default:
+        default:
             turnWhenMove();
             break;
         };
@@ -164,6 +169,7 @@ void motorControl() {
                 }
                 else if (x_axis > 0){
                     left_power =  CURRENT_GEAR ? POWER_LEVEL[CURRENT_GEAR] : POWER_LEVEL[1];
+                    left_power = left_power ? left_power + LEFT_MESURE : left_power;
                     is_rotate_left = true;
                     motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);   
                     motorPowerChangeImmediately(false, right_power, 10, 11, is_rotate_right ? !is_motor_right_reverse : is_motor_right_reverse,  &motor_right_smooth);
@@ -172,6 +178,7 @@ void motorControl() {
         }
     }
 
+    if(y_axis == 1) left_power = left_power ? left_power + LEFT_MESURE : left_power;
     motorPowerChange(left_power, 8, 9, is_motor_left_reverse,  &motor_left_smooth);
     motorPowerChange(right_power, 10, 11, is_motor_right_reverse,  &motor_right_smooth);
 }

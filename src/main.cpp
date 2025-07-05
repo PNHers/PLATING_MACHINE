@@ -32,6 +32,11 @@ void setup() {
     Serial.println("Initialization success!");
 
     time_base_run = millis();
+
+    while(true){
+        ps2x.read_gamepad();
+        if(ps2x.Button(PSB_SELECT) && ps2x.Button(PSB_START)) break;
+    }
 }
 
 int time_base = 0;
@@ -64,11 +69,11 @@ void loop() {
         safety_check();
         resetMotionState();
         
-        for(uint16_t i : pwms){
-            Serial.print(i);
-            Serial.print(", ");
-        }
-        Serial.println("");
+        // for(uint16_t i : pwms){
+        //     Serial.print(i);
+        //     Serial.print(", ");
+        // }
+        // Serial.println("");
 
         pwmController.setChannelsPWM(0, 16, pwms);
         delay(10);
