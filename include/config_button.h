@@ -46,6 +46,12 @@ int LEFT_MESURE = 250;
 #define BASKET_DEFAULT_ROTATION  120
 #define BASKET_HIGH_DEFAULT_ROTATION 50
 
+#define SUPPORT_ARM_SERVO_PIN 6
+#define SUPPORT_ARM_SERVO_ROTATION 90
+
+
+#define ARLAM_HIGH_BASKET_PIN 5
+
 SimpleKalmanFilter motor_left_smooth(100, 0.1, 0.5);
 SimpleKalmanFilter motor_right_smooth(100, 0.1, 0.5);
 

@@ -29,6 +29,8 @@ bool is_counting_press_time = false;
 bool is_start_fruit_basket = false;
 bool is_high_basket = false;
 
+bool is_use_support_arm = false;
+
 PS2X ps2x; // khởi tạo class PS2x
 
 void initPS2() {
@@ -141,58 +143,60 @@ void consoleRead() {
 
 void controlCollector() {
 
-    if (ps2x.ButtonPressed(PSB_GREEN)) collector_rotation_angle += 1; 
-    else if (ps2x.ButtonPressed(PSB_BLUE)) collector_rotation_angle -= 1;
+    // if (ps2x.ButtonPressed(PSB_GREEN)) collector_rotation_angle += 1; 
+    // else if (ps2x.ButtonPressed(PSB_BLUE)) collector_rotation_angle -= 1;
     
-    if (ps2x.Button(PSB_GREEN) || ps2x.Button(PSB_BLUE)) {
-        if (!is_holding_collector_button) {
-            time_base_collector = millis();
-            is_holding_collector_button = true;
-        }
+    // if (ps2x.Button(PSB_GREEN) || ps2x.Button(PSB_BLUE)) {
+    //     if (!is_holding_collector_button) {
+    //         time_base_collector = millis();
+    //         is_holding_collector_button = true;
+    //     }
 
-        time_now_collector = millis();
+    //     time_now_collector = millis();
 
-        if (time_now_collector - time_base_collector >= TIME_SET_COLLECTOR_CHANGE_SPEED) {
-            collector_rotation_angle += (ps2x.Button(PSB_GREEN)) ? 1 : -1;
-        }
-    }
+    //     if (time_now_collector - time_base_collector >= TIME_SET_COLLECTOR_CHANGE_SPEED) {
+    //         collector_rotation_angle += (ps2x.Button(PSB_GREEN)) ? 1 : -1;
+    //     }
+    // }
 
 
-    is_holding_collector_button = (!ps2x.Button(PSB_GREEN) && !ps2x.Button(PSB_BLUE)) ? false : is_holding_collector_button;
+    // is_holding_collector_button = (!ps2x.Button(PSB_GREEN) && !ps2x.Button(PSB_BLUE)) ? false : is_holding_collector_button;
 
-    collector_rotation_angle = min(collector_rotation_angle, 180);
-    collector_rotation_angle = max(collector_rotation_angle, 0);
+    // collector_rotation_angle = min(collector_rotation_angle, 180);
+    // collector_rotation_angle = max(collector_rotation_angle, 0);
 
-    setServo180( COLLECTOR_ROTATION_PIN, collector_rotation_angle);
+    // setServo180( COLLECTOR_ROTATION_PIN, collector_rotation_angle);
 
-    int collector_angle = 0;
+    // int collector_angle = 0;
 
-    if (ps2x.ButtonReleased(PSB_PINK)) {
-        is_counting_press_time = true;
-        time_base_hold_fruit = millis();
-    }
+    // if (ps2x.ButtonReleased(PSB_PINK)) {
+    //     is_counting_press_time = true;
+    //     time_base_hold_fruit = millis();
+    // }
 
-    if (ps2x.Button(PSB_RED)) {
-        collector_angle = POWER_OPEN_COLLECTOR;
-    } else if (ps2x.Button(PSB_PINK)) {
-        if (is_double_press) {
-            collector_angle = POWER_HOLD_COLLECTOR;
-        } else {
-            collector_angle = POWER_CLOSE_COLLECTOR;
-        }
-    }
+    // if (ps2x.Button(PSB_RED)) {
+    //     collector_angle = POWER_OPEN_COLLECTOR;
+    // } else if (ps2x.Button(PSB_PINK)) {
+    //     if (is_double_press) {
+    //         collector_angle = POWER_HOLD_COLLECTOR;
+    //     } else {
+    //         collector_angle = POWER_CLOSE_COLLECTOR;
+    //     }
+    // }
 
-    if (is_counting_press_time) {
-        if (millis() - time_base_hold_fruit >= TIME_SET_COLLECTOR_CHANGE_SPEED) {
-            is_counting_press_time = false;
-            is_double_press = false;
-        } else if (ps2x.Button(PSB_PINK)) {
-            is_double_press = true;
-            is_counting_press_time = false;
-        }
-    }
+    // if (is_counting_press_time) {
+    //     if (millis() - time_base_hold_fruit >= TIME_SET_COLLECTOR_CHANGE_SPEED) {
+    //         is_counting_press_time = false;
+    //         is_double_press = false;
+    //     } else if (ps2x.Button(PSB_PINK)) {
+    //         is_double_press = true;
+    //         is_counting_press_time = false;
+    //     }
+    // }
 
-    setServo360( COLLECTOR_PIN, collector_angle);
+    // setServo360( COLLECTOR_PIN, collector_angle);
+
+    if (ps2x.ButtonPressed(PSB_PINK)) is_use_support_arm = !is_use_support_arm;
 
     // control fruit basket
     if (ps2x.Button(PSB_SELECT)) is_start_fruit_basket = true;
@@ -204,17 +208,25 @@ void controlCollector() {
     if (ps2x.ButtonPressed(PSB_START)) {
         if (is_high_basket) {
             pwms[BASKET_CONTROL_PIN] = 0;
+            pwms[ARLAM_HIGH_BASKET_PIN] = 0;
             is_high_basket = false;
         }
-        else is_high_basket = true;
+        else is_high_basket = true; 
     }
     // if (!ps2x.Button(PSB_START) && is_high_basket) {
     //     pwms[BASKET_CONTROL_PIN] = 0;
     //     is_high_basket = false;
     // }
 
-    if (is_high_basket) {setServo180( BASKET_CONTROL_PIN, BASKET_HIGH_DEFAULT_ROTATION);}
+    if (is_high_basket) {
+        setServo180( BASKET_CONTROL_PIN, BASKET_HIGH_DEFAULT_ROTATION );
+        setServo360( ARLAM_HIGH_BASKET_PIN, POWER_OPEN_COLLECTOR );
+    }
     else if (is_start_fruit_basket) {setServo180( BASKET_CONTROL_PIN, BASKET_DEFAULT_ROTATION);}
+
+    if (is_use_support_arm) {setServo180(SUPPORT_ARM_SERVO_PIN, SUPPORT_ARM_SERVO_ROTATION);}
+    // Serial.println(is_use_support_arm);
+    else {pwms[SUPPORT_ARM_SERVO_PIN] = 0;}
 }
 
 #endif
